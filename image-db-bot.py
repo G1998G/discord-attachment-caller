@@ -267,4 +267,4 @@ if __name__ == '__main__':
         print(f'🟠ログインしました🟠')
     check_db()
 
-bot.run( 'ODI3ODA3ODU2NjUxNzk2NDkw.YGgaJA.8P25rOL5I8cJnThKdBd6eI83Big')
+bot.run( 'TOKEN')
