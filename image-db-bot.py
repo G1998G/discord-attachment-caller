@@ -217,7 +217,7 @@ class DeleteCommand(commands.Cog):
             del keyword
         postc()
 
-class SelectCommand(commands.Cog):
+class ReferenceCommand(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
@@ -255,13 +255,40 @@ class SelectCommand(commands.Cog):
             await ctx.send(content='```このサーバーでは何も登録がないようです。```')
         postc()
 
+
+    @commands.command()
+    async def author(self,ctx,*arg):
+        '''
+        キーワード登録者を表示
+
+        '''
+        _id = ctx.guild.id
+        if arg:
+            arg = ' '.join(arg)
+            res = search_keyword(serverid = _id,keyword = arg)
+            # キーワードが20文字以上の場合は拒否
+            if len(arg) > 20:
+                await ctx.send(content='```登録されているキーワードはスペースキー含め20文字以内のはずです```')
+            else:
+                # キーワードで登録がある場合は上書きするか尋ねる
+                if res:
+                    await ctx.send(content=f'```キーワード:{arg}に画像を登録した人は{bot.get_user(res["userid"]).name}です```')
+                # キーワードに登録がない場合は画像登録
+                else:
+                    await ctx.send(content=f'```キーワード:{arg}で画像は登録されてません。```')
+
+        # キーワードが入力されていない場合はその旨を伝える
+        else:
+            await ctx.send(content='```!authorを入力するときは必ずキーワードを指定してください。```')
+        postc()
+
 if __name__ == '__main__':
-    intents = discord.Intents.all()
+    intents = discord.Intents
     intents.members = True
     bot = commands.Bot(command_prefix='!',intents=intents)
     bot.add_cog(BasicCommand(bot=bot))
     bot.add_cog(DeleteCommand(bot=bot))
-    bot.add_cog(SelectCommand(bot=bot))
+    bot.add_cog(ReferenceCommand(bot=bot))
     @bot.event
     async def on_ready():
         print(f'🟠ログインしました🟠')
