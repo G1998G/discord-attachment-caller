@@ -283,7 +283,7 @@ class ReferenceCommand(commands.Cog):
         postc()
 
 if __name__ == '__main__':
-    intents = discord.Intents
+    intents = discord.Intents.all()
     intents.members = True
     bot = commands.Bot(command_prefix='!',intents=intents)
     bot.add_cog(BasicCommand(bot=bot))
