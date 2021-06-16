@@ -14,7 +14,7 @@ postc = C()
 
 def check_db():
     dbname = 'database.db'
-    with closing(sqlite3.connect(dbname,uri=False)) as connection:
+    with closing(sqlite3.connect(dbname)) as connection:
         cursor = connection.cursor()
         # テーブルを作成
         cursor.execute("SELECT * FROM sqlite_master WHERE type='table' and name='discord_table'")
@@ -29,7 +29,7 @@ def check_db():
 
 def insert_dt(serverid,keyword,content,userid):
     dbname = 'database.db'
-    with closing(sqlite3.connect(dbname,uri=False)) as connection:
+    with closing(sqlite3.connect(dbname)) as connection:
         cursor = connection.cursor()
         sql = 'INSERT INTO discord_table (serverid,keyword,content,userid) VALUES (?,?,?,?)'
         data = (int(serverid), keyword, content, userid)
@@ -39,7 +39,7 @@ def insert_dt(serverid,keyword,content,userid):
 
 def update_dt(serverid,keyword,content,userid):
     dbname = 'database.db'
-    with closing(sqlite3.connect(dbname,uri=False)) as connection:
+    with closing(sqlite3.connect(dbname)) as connection:
         cursor = connection.cursor()
         sql = 'UPDATE discord_table SET content=?, userid=? WHERE serverid=? AND keyword=?'
         data = (content, userid, serverid, keyword)
@@ -50,7 +50,7 @@ def update_dt(serverid,keyword,content,userid):
 
 def delete_dt(serverid,keyword):
     dbname = 'database.db'
-    with closing(sqlite3.connect(dbname,uri=False)) as connection:
+    with closing(sqlite3.connect(dbname)) as connection:
         cursor = connection.cursor()
         sql = 'DELETE FROM discord_table WHERE serverid=? AND keyword=?'
         data = (int(serverid), keyword)
@@ -61,7 +61,7 @@ def delete_dt(serverid,keyword):
 def search_keyword(serverid,keyword):
     dbname = 'database.db'
     res = dict()
-    with closing(sqlite3.connect(dbname,uri=False)) as connection:
+    with closing(sqlite3.connect(dbname)) as connection:
         # sqlite3.Rowでカラム名での取得を可能にする。
         connection.row_factory = sqlite3.Row
         cursor = connection.cursor()
@@ -76,7 +76,7 @@ def search_keyword(serverid,keyword):
     return res
             
 
-def resistered_list(serverid):
+def registered_list(serverid):
     dbname = 'database.db'
     res = list()
     with closing(sqlite3.connect(dbname)) as connection:
@@ -228,7 +228,7 @@ class ReferenceCommand(commands.Cog):
         登録一覧を表示
         '''
         _id = ctx.guild.id
-        res = resistered_list(serverid=_id)
+        res = registered_list(serverid=_id)
         if res:
             print(res)
             embed=discord.Embed(title=f"登録一覧 ",description=f"登録数:{len(res)}",color=0xff0000)
@@ -241,15 +241,13 @@ class ReferenceCommand(commands.Cog):
                 _index = 30
                 while x <= q:
                     content = res[_index:_index+30]
-                    embed=discord.Embed(title=f"登録一覧(続き)",color=0xff0000)
-                    embed.add_field(name='_', value=f"{''.join(content)}", inline=False)
+                    embed=discord.Embed(title=f"登録一覧(続き)",description=f"{''.join(content)}", color=0xff0000)
                     await ctx.send(embed = embed)
                     x +=1
                     _index += 30
                 if mod > 0:
                     content = res[_index:_index+mod-1]
-                    embed=discord.Embed(title=f"登録一覧(続き)",color=0xff0000)
-                    embed.add_field(name='_', value=f"{''.join(content)}", inline=False)
+                    embed=discord.Embed(title=f"登録一覧(続き)",description=f"{''.join(content)}",color=0xff0000)
                     await ctx.send(embed = embed)
         else:
             await ctx.send(content='```このサーバーでは何も登録がないようです。```')
@@ -259,7 +257,7 @@ class ReferenceCommand(commands.Cog):
     @commands.command()
     async def author(self,ctx,*arg):
         '''
-        キーワード登録者を表示
+        入力されたキーワードでの登録者を表示
 
         '''
         _id = ctx.guild.id
@@ -280,6 +278,22 @@ class ReferenceCommand(commands.Cog):
         # キーワードが入力されていない場合はその旨を伝える
         else:
             await ctx.send(content='```!authorを入力するときは必ずキーワードを指定してください。```')
+        postc()
+
+    @commands.command()
+    async def count(self,ctx,*arg):
+        '''
+        登録数を表示
+
+        '''
+        _id = ctx.guild.id
+        res = registered_list(serverid = _id)
+        # キーワードで登録がある場合は上書きするか尋ねる
+        if res:
+            await ctx.send(content=f'```このサーバーでの登録数は{len(res)}個です。```')
+        # キーワードに登録がない場合は画像登録
+        else:
+            await ctx.send(content=f'```このサーバーで登録はありません。```')
         postc()
 
 if __name__ == '__main__':
