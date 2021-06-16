@@ -111,24 +111,23 @@ class BasicCommand(commands.Cog):
                 # キーワードが10文字以上の場合は拒否
                 if len(arg) > 15:
                     await ctx.send(content='```キーワードはスペース含め15文字以内に収めてください```')
+                # キーワードで登録がある場合は上書きするか尋ねる
+                elif res:
+                    await ctx.send(content=f'```キーワード:{arg}は既にこの画像が登録されています。画像を上書きする場合は !okと入力してください。しない場合は!noと入力してください。```\n{res["content"]}')
+                    # 登録は１枚まで。
+                    for attachment in ctx.message.attachments:
+                        attachment = str(attachment)
+                        self.update_file[str(_id)] = [arg,attachment]
+                        print(self.update_file[str(_id)])
+                        break
+                # キーワードに登録がない場合は画像登録
                 else:
-                    # キーワードで登録がある場合は上書きするか尋ねる
-                    if res:
-                        await ctx.send(content=f'```キーワード:{arg}は既にこの画像が登録されています。画像を上書きする場合は !okと入力してください。しない場合は!noと入力してください。```\n{res["content"]}')
-                        # 登録は１枚まで。
-                        for attachment in ctx.message.attachments:
-                            attachment = str(attachment)
-                            self.update_file[str(_id)] = [arg,attachment]
-                            print(self.update_file[str(_id)])
-                            break
-                    # キーワードに登録がない場合は画像登録
-                    else:
-                        # 登録は１枚まで。
-                        for attachment in ctx.message.attachments:
-                            attachment = str(attachment)
-                            insert_dt(serverid=_id,keyword=arg,content=attachment,userid=ctx.author.id)
-                            await ctx.send(content=f'```キーワード:{arg}で画像を登録しました。```')
-                            break
+                    # 登録は１枚まで。
+                    for attachment in ctx.message.attachments:
+                        attachment = str(attachment)
+                        insert_dt(serverid=_id,keyword=arg,content=attachment,userid=ctx.author.id)
+                        await ctx.send(content=f'```キーワード:{arg}で画像を登録しました。```')
+                        break
 
             # アタッチメントが無く、登録もない場合はその旨を伝える
             elif not res:
