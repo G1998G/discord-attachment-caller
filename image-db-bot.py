@@ -86,7 +86,7 @@ def registered_list(serverid):
         data = (serverid,)
         cursor.execute(sql, data)
         for row in cursor:
-            res.append(f'> **`{row["keyword"]}`** _`{bot.get_user(row["userid"]).name}`_\n')
+            res.append(f'**`{row["keyword"]}`** _`{bot.get_user(row["userid"]).name}`_\n')
         connection.close()
     return res  
 
@@ -110,10 +110,10 @@ class BasicCommand(commands.Cog):
             if ctx.message.attachments:
                 # キーワードが10文字以上の場合は拒否
                 if len(arg) > 15:
-                    await ctx.send(content='```キーワードはスペース含め15文字以内に収めてください```')
+                    await ctx.send(content='`キーワードはスペース含め15文字以内に収めてください`')
                 # キーワードで登録がある場合は上書きするか尋ねる
                 elif res:
-                    await ctx.send(content=f'```キーワード:{arg}は既にこの画像が登録されています。画像を上書きする場合は !okと入力してください。しない場合は!noと入力してください。```\n{res["content"]}')
+                    await ctx.send(content=f'`キーワード:{arg}は既にこの画像が登録されています。画像を上書きする場合は !okと入力してください。しない場合は!noと入力してください。`\n{res["content"]}')
                     # 登録は１枚まで。
                     for attachment in ctx.message.attachments:
                         attachment = str(attachment)
@@ -126,18 +126,18 @@ class BasicCommand(commands.Cog):
                     for attachment in ctx.message.attachments:
                         attachment = str(attachment)
                         insert_dt(serverid=_id,keyword=arg,content=attachment,userid=ctx.author.id)
-                        await ctx.send(content=f'```キーワード:{arg}で画像を登録しました。```')
+                        await ctx.send(content=f'`キーワード:{arg}で画像を登録しました。`')
                         break
 
             # アタッチメントが無く、登録もない場合はその旨を伝える
             elif not res:
-                await ctx.send(content=f'```キーワード:{arg}で画像は登録されてません。```')
+                await ctx.send(content=f'`キーワード:{arg}で画像は登録されてません。`')
             # アタッチメントが無く、登録がある場合は登録画像を表示
             else:
                 await ctx.send(content=f'{res["content"]}')
         # キーワードが入力されていない場合はその旨を伝える
         else:
-            await ctx.send(content='```!imgを入力するときは必ずキーワードを指定してください。```')
+            await ctx.send(content='`!imgを入力するときは必ずキーワードを指定してください。`')
         postc()
 
     @commands.command()
@@ -150,7 +150,7 @@ class BasicCommand(commands.Cog):
             keyword = self.update_file[str(_id)][0]
             attachment = self.update_file[str(_id)][1]
             update_dt(serverid=_id, keyword=keyword, content=attachment, userid=ctx.author.id)
-            await ctx.send(content=f'```キーワード:{keyword}の既存画像を指定画像で上書きしました。```')
+            await ctx.send(content=f'`キーワード:{keyword}の既存画像を指定画像で上書きしました。`')
             del self.update_file[str(_id)]
         postc()
 
@@ -162,7 +162,7 @@ class BasicCommand(commands.Cog):
         _id = ctx.guild.id
         if  str(_id) in self.update_file:
             keyword = self.update_file[str(_id)][0]
-            await ctx.send(content=f'```キーワード:{keyword}に登録された既存画像を指定された画像で上書きしません。```')
+            await ctx.send(content=f'`キーワード:{keyword}に登録された既存画像を指定された画像で上書きしません。`')
             del self.update_file[str(_id)]
         postc()
 
@@ -183,12 +183,12 @@ class DeleteCommand(commands.Cog):
             arg = ' '.join(arg)
             res = search_keyword(serverid = _id,keyword = arg)
             if res:
-                await ctx.send(content=f'```キーワード:{arg}に登録されたこの画像を削除しますか？　削除する場合は !delok, しない場合は !delnoと入力してください。```\n{res["content"]}')
+                await ctx.send(content=f'`キーワード:{arg}に登録されたこの画像を削除しますか？　削除する場合は !delok, しない場合は !delnoと入力してください。`\n{res["content"]}')
                 self.deletekeyword[str(_id)] = arg
             else:
-                await ctx.send(content=f'```キーワード:{arg}の登録はありません。```')
+                await ctx.send(content=f'`キーワード:{arg}の登録はありません。`')
         else:
-            await ctx.send(content='```削除する画像のキーワードを指定してください。```')
+            await ctx.send(content='`削除する画像のキーワードを指定してください。`')
         postc()
 
     @commands.command()
@@ -200,7 +200,7 @@ class DeleteCommand(commands.Cog):
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
             delete_dt(serverid=_id, keyword=keyword)
-            await ctx.send(content=f'```キーワード:{keyword}に登録された画像を削除しました。```')
+            await ctx.send(content=f'`キーワード:{keyword}に登録された画像を削除しました。`')
             del keyword
         postc()
 
@@ -212,7 +212,7 @@ class DeleteCommand(commands.Cog):
         _id = ctx.guild.id
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
-            await ctx.send(content=f'```キーワード:{keyword}に登録された画像を削除しません。```')
+            await ctx.send(content=f'`キーワード:{keyword}に登録された画像を削除しません。`')
             del keyword
         postc()
 
@@ -229,34 +229,35 @@ class ReferenceCommand(commands.Cog):
         _id = ctx.guild.id
         res = registered_list(serverid=_id)
         if res:
-            print(res)
-            embed=discord.Embed(title=f"登録一覧 ",description=f"登録数:{len(res)}",color=0xff0000)
-            embed.add_field(name="🔻一覧🔻", value=f"{''.join(res[0:29])}", inline=False)
-            await ctx.send(embed = embed)
-            if len(res) > 30:
-                q = len(res) // 30
-                mod = len(res) % 30
-                x = 0
-                _index = 30
-                while x <= q:
-                    content = res[_index:_index+30]
-                    embed=discord.Embed(title=f"登録一覧(続き)",description=f"{''.join(content)}", color=0xff0000)
-                    await ctx.send(embed = embed)
+            print(res,len(res))
+            embed1=discord.Embed(title=f"登録一覧(登録数:{len(res)})",description=f"{''.join(res[0:33])}",color=discord.Colour.dark_orange())
+            await ctx.send(embed = embed1)
+            if len(res) > 34:
+                q = len(res) // 34
+                mod = len(res) % 34
+                x = 1
+                _index = 34
+                while x < q:
+                    content1 = res[_index:_index+34]
+                    print(len(content1))
+                    embed2=discord.Embed(title=f"登録一覧(続き)",description=f"{' '.join(content1)}",color=discord.Colour.dark_orange())
+                    await ctx.send(embed = embed2)
                     x +=1
-                    _index += 30
+                    _index += 34
                 if mod > 0:
-                    content = res[_index:_index+mod-1]
-                    embed=discord.Embed(title=f"登録一覧(続き)",description=f"{''.join(content)}",color=0xff0000)
-                    await ctx.send(embed = embed)
+                    content2= res[_index:_index+mod-1]
+                    print(len(content2))
+                    embed3=discord.Embed(title=f"登録一覧(続き)",description=f"{''.join(content2)}",color=discord.Colour.dark_orange())
+                    await ctx.send(embed = embed3)
         else:
-            await ctx.send(content='```このサーバーでは何も登録がないようです。```')
+            await ctx.send(content='`このサーバーでは何も登録がないようです。`')
         postc()
 
 
     @commands.command()
     async def author(self,ctx,*arg):
         '''
-        入力されたキーワードでの登録者を表示
+        入力されたキーワードの登録者を表示
 
         '''
         _id = ctx.guild.id
@@ -265,18 +266,16 @@ class ReferenceCommand(commands.Cog):
             res = search_keyword(serverid = _id,keyword = arg)
             # キーワードが20文字以上の場合は拒否
             if len(arg) > 20:
-                await ctx.send(content='```登録されているキーワードはスペースキー含め20文字以内のはずです```')
+                await ctx.send(content='`登録されているキーワードはスペースキー含め20文字以内のはずです`')
             else:
-                # キーワードで登録がある場合は上書きするか尋ねる
                 if res:
-                    await ctx.send(content=f'```キーワード:{arg}に画像を登録した人は{bot.get_user(res["userid"]).name}です```')
-                # キーワードに登録がない場合は画像登録
+                    await ctx.send(content=f'`キーワード:{arg}に画像を登録した人は{bot.get_user(res["userid"]).name}です`')
                 else:
-                    await ctx.send(content=f'```キーワード:{arg}で画像は登録されてません。```')
+                    await ctx.send(content=f'`キーワード:{arg}で画像は登録されてません。`')
 
         # キーワードが入力されていない場合はその旨を伝える
         else:
-            await ctx.send(content='```!authorを入力するときは必ずキーワードを指定してください。```')
+            await ctx.send(content='`!authorを入力するときは必ずキーワードを指定してください。`')
         postc()
 
     @commands.command()
@@ -287,12 +286,12 @@ class ReferenceCommand(commands.Cog):
         '''
         _id = ctx.guild.id
         res = registered_list(serverid = _id)
-        # キーワードで登録がある場合は上書きするか尋ねる
+        # 登録がある場合は登録数を表示
         if res:
-            await ctx.send(content=f'```このサーバーでの登録数は{len(res)}個です。```')
-        # キーワードに登録がない場合は画像登録
+            await ctx.send(content=f'`このサーバーでの登録数は{len(res)}個です。`')
+        # キーワードに登録がない場合はそのことを伝える。
         else:
-            await ctx.send(content=f'```このサーバーで登録はありません。```')
+            await ctx.send(content=f'`このサーバーで登録はありません。`')
         postc()
 
 if __name__ == '__main__':
