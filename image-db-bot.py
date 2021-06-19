@@ -294,6 +294,17 @@ class ReferenceCommand(commands.Cog):
             await ctx.send(content=f'`このサーバーで登録はありません。`')
         postc()
 
+    @commands.command()
+    async def profile(self,ctx,*args):
+        '''
+        bot作成者の紹介
+        '''
+        C.initial(ctx)
+        embed= discord.Embed(title="**bot作成者**", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
+        embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
+        await ctx.send(embed=embed)
+        postc()
+
 if __name__ == '__main__':
     intents = discord.Intents.all()
     intents.members = True
