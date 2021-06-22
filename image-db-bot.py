@@ -2,6 +2,8 @@ from discord.ext import commands # Bot Commands Frameworkのインポート
 import discord
 import sqlite3
 from contextlib import closing
+from disputils import BotEmbedPaginator
+from disputils.pagination import ControlEmojis
 
 # guild内投稿回数カウント用
 class C:
@@ -89,6 +91,33 @@ def registered_list(serverid):
             res.append(f'**`{row["keyword"]}`** _`{bot.get_user(row["userid"]).name}`_\n')
         connection.close()
     return res  
+
+class HelpCommand(commands.HelpCommand):
+    def __init__(self):
+        super().__init__()
+        self.no_category = "HelpCommand"
+        self.command_attrs["description"] = "コマンドリストを表示します。"
+
+    async def send_bot_help(self,mapping):
+        content = ""
+        for cog in mapping:
+            # 各コグのコマンド一覧を content に追加していく
+            command_list = await self.filter_commands(mapping[cog])
+            if not command_list:
+                # 表示できるコマンドがないので、他のコグの処理に移る
+                continue
+            if cog is None:
+                # コグが未設定のコマンドなので、no_category属性を参照する
+                content += f"\n**{self.no_category}**\n"
+            else:
+                content += f"\n**{cog.qualified_name}**\n"
+            for command in command_list:
+                content += f"{self.context.prefix}{command.name}  `{command.help}`\n"
+            content += "\n"
+        embed = discord.Embed(title="**コマンドリスト**",description=content,color=discord.Colour.dark_orange())
+        await self.get_destination().send(embed=embed)
+        postc()
+
 
 class BasicCommand(commands.Cog):
 
@@ -201,7 +230,9 @@ class DeleteCommand(commands.Cog):
             keyword = self.deletekeyword[str(_id)]
             delete_dt(serverid=_id, keyword=keyword)
             await ctx.send(content=f'`キーワード:{keyword}に登録された画像を削除しました。`')
-            del keyword
+            del self.deletekeyword[str(_id)],keyword
+        else:
+            await ctx.send(content=f'`このコマンドは登録画像削除実行用コマンドです。まずはdelok キーワードで削除する画像を指定してください`')
         postc()
 
     @commands.command()
@@ -213,42 +244,48 @@ class DeleteCommand(commands.Cog):
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
             await ctx.send(content=f'`キーワード:{keyword}に登録された画像を削除しません。`')
-            del keyword
+            del self.deletekeyword[str(_id)],keyword
+        else:
+            await ctx.send(content=f'`このコマンドは登録画像削除実行用コマンドです。まずはdelok キーワードで削除する画像を指定してください`')
         postc()
+
+
 
 class ReferenceCommand(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
 
-    @commands.command(name='list')
-    async def _list(self,ctx):
+    @commands.command(name="list")
+    async def pagenate(self,ctx,*args):
         '''
         登録一覧を表示
         '''
+        embeds = []
         _id = ctx.guild.id
         res = registered_list(serverid=_id)
         if res:
             print(res,len(res))
-            embed1=discord.Embed(title=f"登録一覧(登録数:{len(res)})",description=f"{''.join(res[0:33])}",color=discord.Colour.dark_orange())
-            await ctx.send(embed = embed1)
-            if len(res) > 34:
-                q = len(res) // 34
-                mod = len(res) % 34
+            page = 1
+            embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}",color=discord.Colour.dark_orange()) )
+            if len(res) > 20:
+                q = len(res) // 20
+                mod = len(res) % 20
                 x = 1
-                _index = 34
+                _index = 20
                 while x < q:
-                    content1 = res[_index:_index+34]
-                    print(len(content1))
-                    embed2=discord.Embed(title=f"登録一覧(続き)",description=f"{' '.join(content1)}",color=discord.Colour.dark_orange())
-                    await ctx.send(embed = embed2)
+                    page += 1
+                    content1 = res[_index:_index+20]
+                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}",color=discord.Colour.dark_orange()) )
                     x +=1
-                    _index += 34
+                    _index += 20
                 if mod > 0:
+                    page += 1
                     content2= res[_index:_index+mod-1]
-                    print(len(content2))
-                    embed3=discord.Embed(title=f"登録一覧(続き)",description=f"{''.join(content2)}",color=discord.Colour.dark_orange())
-                    await ctx.send(embed = embed3)
+                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}",color=discord.Colour.dark_orange()) )
+
+            paginator = BotEmbedPaginator(ctx, pages=embeds,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
+            await paginator.run(timeout_msg='```listコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。```')
         else:
             await ctx.send(content='`このサーバーでは何も登録がないようです。`')
         postc()
@@ -299,7 +336,6 @@ class ReferenceCommand(commands.Cog):
         '''
         bot作成者の紹介
         '''
-        C.initial(ctx)
         embed= discord.Embed(title="**bot作成者**", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
         embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
         await ctx.send(embed=embed)
@@ -308,7 +344,7 @@ class ReferenceCommand(commands.Cog):
 if __name__ == '__main__':
     intents = discord.Intents.all()
     intents.members = True
-    bot = commands.Bot(command_prefix='!',intents=intents)
+    bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),intents=intents,help_command= HelpCommand())
     bot.add_cog(BasicCommand(bot=bot))
     bot.add_cog(DeleteCommand(bot=bot))
     bot.add_cog(ReferenceCommand(bot=bot))
