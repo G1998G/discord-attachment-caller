@@ -10,9 +10,9 @@ from typing import Union
 class C:
     def __init__(self):
         self.x = 0
-    def __call__(self):
+    def __call__(self,arg):
         self.x += 1
-        return print(f'コマンド受け取り🟢{self.x}回目')
+        return print(f'コマンド受け取り🟢{self.x}回目　コマンド引数:{arg}')
 postc = C()
 
 def check_db():
@@ -134,7 +134,7 @@ class Msg:
     
     @staticmethod
     async def no_img(ctx,keyword):
-        await ctx.send(content=f'`キーワード:{keyword}で画像は登録されてません。`')
+        await ctx.send(content=f'`キーワード:{keyword}でファイルは登録されてません。`')
 
 
 
@@ -163,7 +163,9 @@ class HelpCommand(commands.HelpCommand):
             for command in command_list:
                 content += f"{self.context.prefix}{command.name}  `{command.help}`\n"
             content += "\n"
-        embed = discord.Embed(title="**コマンドリスト**",description=content)
+        embed = discord.Embed(title="**呼び出し君bot**",description='```discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。```')
+        embed = embed.add_field(name="**コマンドリスト**",value=content)
+
         await self.get_destination().send(embed=embed)
         postc()
 
@@ -176,9 +178,9 @@ class BasicCommand(commands.Cog):
         self.update_file = dict()
 
     @commands.command()
-    async def img(self,ctx,*arg):
+    async def call(self,ctx,*arg):
         '''
-        新規登録機能、登録済み画像表示機能
+        新規登録/登録済みファイルの呼び出し
 
         '''
         _id = ctx.guild.id
@@ -196,7 +198,7 @@ class BasicCommand(commands.Cog):
                 
                 elif res:
                     # キーワードで登録がある場合は上書きするか尋ねる
-                    await ctx.send(content=f'`キーワード:{arg}は既にこの画像が登録されています。画像を上書きする場合は {ctx.prefix}okと入力してください。しない場合は{ctx.prefix}noと入力してください。`\n{res["content"]}')
+                    await ctx.send(content=f'`キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換える場合は {ctx.prefix}okと入力してください。置き換えない場合は{ctx.prefix}noと入力してください。`\n{res["content"]}')
                     # 登録は１枚まで。
                     for attachment in ctx.message.attachments:
                         attachment = str(attachment)
@@ -210,7 +212,8 @@ class BasicCommand(commands.Cog):
                     for attachment in ctx.message.attachments:
                         attachment = str(attachment)
                         insert_dt(serverid=_id,keyword=arg,content=attachment,userid=ctx.author.id)
-                        await ctx.send(content=f'`キーワード:{arg}で画像を登録しました。`')
+                        await ctx.send(content=f'`キーワード:{arg}でファイルを登録しました。`')
+                        print(f'新規登録:{arg},url:{attachment},by{ctx.author.id}')
                         break
 
             
@@ -221,33 +224,34 @@ class BasicCommand(commands.Cog):
             else:
                 # アタッチメントが無く、登録がある場合は登録画像を表示
                 await ctx.send(content=f'{res["content"]}')
-        postc()
+                print(f'表示:{arg}')
+        postc(arg)
 
     @commands.command()
     async def ok(self,ctx,*arg):
         '''
-        登録済み画像への上書き確認 OK
+        登録済みファイルの置き換え確認 OK
         '''
         _id = ctx.guild.id
         if str(_id) in self.update_file:
             keyword = self.update_file[str(_id)][0]
             attachment = self.update_file[str(_id)][1]
             update_dt(serverid=_id, keyword=keyword, content=attachment, userid=ctx.author.id)
-            await ctx.send(content=f'`キーワード:{keyword}の既存画像を指定画像で上書きしました。`')
+            await ctx.send(content=f'`キーワード:{keyword}の既存アタッチメントを指定ファイルで置き換えしました。`')
             del self.update_file[str(_id)]
         postc()
 
     @commands.command()
     async def no(self,ctx,*arg):
         '''
-        登録済み画像への上書き確認　NO
+        登録済みファイルの置き換え確認　NO
         '''
         _id = ctx.guild.id
         if  str(_id) in self.update_file:
             keyword = self.update_file[str(_id)][0]
-            await ctx.send(content=f'`キーワード:{keyword}に登録された既存画像を指定された画像で上書きしません。`')
+            await ctx.send(content=f'`キーワード:{keyword}に登録された既存ファイルを指定されたファイルで置き換えしません。`')
             del self.update_file[str(_id)]
-        postc()
+        postc(arg)
 
 class DeleteCommand(commands.Cog):
 
@@ -259,7 +263,7 @@ class DeleteCommand(commands.Cog):
     @commands.command(name='del')
     async def _delete(self,ctx,*arg):
         '''
-        登録済み画像を削除する
+        登録を削除する
         '''
         _id = ctx.guild.id
         if arg:
@@ -271,42 +275,42 @@ class DeleteCommand(commands.Cog):
 
             res = search_keyword(serverid = _id,keyword = arg)
             if res:
-                await ctx.send(content=f'`キーワード:{arg}に登録されたこの画像を削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。`\n{res["content"]}')
+                await ctx.send(content=f'`キーワード:{arg}に登録されたこのファイルを削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。`\n{res["content"]}')
                 self.deletekeyword[str(_id)] = arg
             else:
                 await Msg.no_img(ctx,arg)
         else:
             await Msg.no_key(ctx)
-        postc()
+        postc(arg)
 
     @commands.command()
     async def delok(self,ctx,*arg):
         '''
-        登録済み画像削除を確認 OK
+        登録削除を確認 OK
         '''
         _id = ctx.guild.id
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
             delete_dt(serverid=_id, keyword=keyword)
-            await ctx.send(content=f'`キーワード:{keyword}に登録された画像を削除しました。`')
+            await ctx.send(content=f'`キーワード:{keyword}に登録されたファイルを削除しました。`')
             del self.deletekeyword[str(_id)]
         else:
-            await ctx.send(content=f'`このコマンドは登録画像削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する画像を指定してください`')
+            await ctx.send(content=f'`このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する登録を指定してください`')
         postc()
 
     @commands.command()
     async def delno(self,ctx,*arg):
         '''
-        登録済み画像削除を確認 NO
+        登録削除を確認 NO
         '''
         _id = ctx.guild.id
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
-            await ctx.send(content=f'`キーワード:{keyword}に登録された画像を削除しません。`')
+            await ctx.send(content=f'`キーワード:{keyword}に登録されたファイルを削除しません。`')
             del self.deletekeyword[str(_id)]
         else:
-            await ctx.send(content=f'`このコマンドは登録画像削除実行用コマンドです。まずは{ctx.prefix}del キーワードで削除する画像を指定してください`')
-        postc()
+            await ctx.send(content=f'`このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}del キーワードで削除する登録を指定してください`')
+        postc(arg)
 
 
 
@@ -316,7 +320,7 @@ class ReferenceCommand(commands.Cog):
         self.bot = bot
 
     @commands.command(name="list")
-    async def pagenate(self,ctx,*args):
+    async def pagenate(self,ctx,*arg):
         '''
         登録一覧を表示
         '''
@@ -347,7 +351,7 @@ class ReferenceCommand(commands.Cog):
             await paginator.run(timeout_msg='```listコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。```')
         else:
             await ctx.send(content='`このサーバーでは何も登録がないようです。`')
-        postc()
+        postc(arg)
 
     @commands.command(name="search")
     async def partialmatch(self,ctx,*args):
@@ -390,14 +394,15 @@ class ReferenceCommand(commands.Cog):
                 await paginator.run(timeout_msg='`searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。`')
             else:
                 await ctx.send(content= f'`キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。`')
-        postc()
+        postc(args)
 
     @commands.command()
     async def author(self,ctx,arg: Union[discord.Member,int,str] = None):
         '''
-        指定ユーザーがの登録一覧を表示。無指定の場合書き込み者の登録一覧
+        指定ユーザーの登録一覧を表示。無指定の場合書き込み者の登録一覧
 
         '''
+        print(f'{ctx.author.id}')
         if not arg:
             res = search_author(serverid=ctx.guild.id,userid=ctx.author.id)
         elif type(arg) is discord.Member:
@@ -440,7 +445,7 @@ class ReferenceCommand(commands.Cog):
         postc()
 
     @commands.command()
-    async def count(self,ctx,*arg):
+    async def count(self,ctx,*args):
         '''
         登録数を表示
 
@@ -453,7 +458,7 @@ class ReferenceCommand(commands.Cog):
         # キーワード登録がない場合はそのことを伝える。
         else:
             await ctx.send(content=f'`このサーバーで登録はありません。`')
-        postc()
+        postc(args)
 
     @commands.command()
     async def profile(self,ctx,*args):
@@ -463,7 +468,7 @@ class ReferenceCommand(commands.Cog):
         embed= discord.Embed(title="**bot作成者**", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
         embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
         await ctx.send(embed=embed)
-        postc()
+        postc(args)
 
 if __name__ == '__main__':
     intents = discord.Intents.all()
@@ -477,4 +482,4 @@ if __name__ == '__main__':
         print(f'🟠ログインしました🟠')
     check_db()
 
-bot.run( 'Token')
+bot.run( 'TOKEN')
