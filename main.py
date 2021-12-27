@@ -3,8 +3,6 @@ import discord
 import sqlite3
 from contextlib import closing
 
-
-
 # guild内投稿回数カウント用
 class C:
     def __init__(self):
@@ -168,6 +166,7 @@ class HelpCommand(commands.HelpCommand):
         await self.get_destination().send(embed=embed)
         postc()
 
+
 intents = discord.Intents.all()
 intents.members = True
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("-"),intents=intents,help_command= HelpCommand())
@@ -179,7 +178,5 @@ async def on_ready():
     print(f'🟠ログインしました🟠')
 check_db()
 bot.run( 'ODI3ODA3ODU2NjUxNzk2NDkw.YGgaJA.7iQtMY_BmV3PeQ_VuSTY54gQ0RY')
-
-
 
     

@@ -1,7 +1,7 @@
 from discord.ext import commands # Bot Commands Frameworkのインポート
 import discord
 from disputils.pagination import ControlEmojis
-import yobidashi_main as mainpy
+import main as mainpy
 
 class BasicCommands(commands.Cog):
 
