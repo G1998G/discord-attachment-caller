@@ -177,6 +177,6 @@ bot.load_extension('ref_cog')
 async def on_ready():
     print(f'🟠ログインしました🟠')
 check_db()
-bot.run( 'ODI3ODA3ODU2NjUxNzk2NDkw.YGgaJA.7iQtMY_BmV3PeQ_VuSTY54gQ0RY')
+bot.run( 'TOKEN')
 
     
