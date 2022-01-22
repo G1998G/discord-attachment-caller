@@ -45,7 +45,7 @@ class DeleteCommands(commands.Cog):
             del self.deletekeyword[str(_id)]
         else:
             await ctx.send(content=f'`このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する登録を指定してください`')
-        mainpy.postc()
+        mainpy.postc(arg)
 
     @commands.command()
     async def delno(self,ctx,*arg):

@@ -7,8 +7,12 @@ from contextlib import closing
 class C:
     def __init__(self):
         self.x = 0
-    def __call__(self,arg):
+    def __call__(self,*arg : tuple):
         self.x += 1
+        if arg:
+            arg = ''.join(arg)
+        else:
+            arg =" -コマンド引数なし"
         return print(f'コマンド受け取り🟢{self.x}回目　コマンド引数:{arg}')
 postc = C()
 
@@ -160,7 +164,7 @@ class HelpCommand(commands.HelpCommand):
             for command in command_list:
                 content += f"{self.context.prefix}{command.name}  `{command.help}`\n"
             content += "\n"
-        embed = discord.Embed(title="**呼び出し君bot**",description='```discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。```')
+        embed = discord.Embed(title="**呼び出し君bot**",description=f'```discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。 \nコマンドの先頭には「{self.context.prefix}」を付けてください。```')
         embed = embed.add_field(name="**コマンドリスト**",value=content)
 
         await self.get_destination().send(embed=embed)
