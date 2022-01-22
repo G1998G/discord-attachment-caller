@@ -12,7 +12,7 @@ class C:
         if arg is tuple :
             arg = ''.join(arg)
 
-        elif arg is str:
+        elif arg is str or int:
             pass
         else:
             arg =" -コマンド引数なし"
