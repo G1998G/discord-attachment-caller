@@ -9,8 +9,11 @@ class C:
         self.x = 0
     def __call__(self,*arg : tuple):
         self.x += 1
-        if arg:
+        if arg is tuple :
             arg = ''.join(arg)
+
+        elif arg is str:
+            pass
         else:
             arg =" -コマンド引数なし"
         return print(f'コマンド受け取り🟢{self.x}回目　コマンド引数:{arg}')
@@ -181,6 +184,6 @@ bot.load_extension('ref_cog')
 async def on_ready():
     print(f'🟠ログインしました🟠')
 check_db()
-bot.run( 'TOKEN')
+bot.run( 'token')
 
     
