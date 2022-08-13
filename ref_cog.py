@@ -39,9 +39,9 @@ class ReferenceCommands(commands.Cog):
                     embed.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
 
             paginator = BotEmbedPaginator(ctx, pages=embed,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
-            await paginator.run(timeout_msg='```listコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。```')
+            await paginator.run(timeout_msg='>>> listコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。')
         else:
-            await ctx.send(content='`このサーバーでは何も登録がないようです。`')
+            await ctx.send(content='>>> このサーバーでは何も登録がないようです。')
         main.postc(arg)
 
     @commands.command(name="search")
@@ -82,9 +82,9 @@ class ReferenceCommands(commands.Cog):
                         embed.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
 
                 paginator = BotEmbedPaginator(ctx, pages=embed,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
-                await paginator.run(timeout_msg='`searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。`')
+                await paginator.run(timeout_msg='>>> searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。')
             else:
-                await ctx.send(content= f'`キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。`')
+                await ctx.send(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
         main.postc(args)
 
     @commands.command()
@@ -101,7 +101,7 @@ class ReferenceCommands(commands.Cog):
             print(type(arg))
             res = main.search_author(guild_id=ctx.guild.id,userid=arg.id)
         else:
-            await ctx.send(f'```検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。```')
+            await ctx.send(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
             return
 
         if res:
@@ -130,9 +130,9 @@ class ReferenceCommands(commands.Cog):
                     embed.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
 
             paginator = BotEmbedPaginator(ctx, pages=embed,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
-            await paginator.run(timeout_msg='`searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。`')
+            await paginator.run(timeout_msg='>>> searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。')
         else:
-            await ctx.send(content= f'`ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。`')
+            await ctx.send(content= f'>>> ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。')
         main.postc(arg)
 
     @commands.command()
@@ -145,10 +145,10 @@ class ReferenceCommands(commands.Cog):
         res = main.sql.registered_list(guild_id = _id)
         # 登録がある場合は登録数を表示
         if res:
-            await ctx.send(content=f'`このサーバーでの登録数は{len(res)}個です。`')
+            await ctx.send(content=f'>>> このサーバーでの登録数は{len(res)}個です。')
         # キーワード登録がない場合はそのことを伝える。
         else:
-            await ctx.send(content=f'`このサーバーで登録はありません。`')
+            await ctx.send(content=f'>>> このサーバーで登録はありません。')
         main.postc(args)
 
     @commands.command()
