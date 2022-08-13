@@ -25,15 +25,15 @@ class Msg:
 
     @staticmethod
     async def len_over(ctx):
-        await ctx.send(f'```キーワードはスペース含め20文字以内で入力してください。```')
+        await ctx.send(f'>>> キーワードはスペース含め20文字以内で入力してください。')
     
     @staticmethod
     async def no_key(ctx):
-        await ctx.send(f'```{ctx.prefix}{ctx.invoked_with}入力時は必ずキーワードを指定してください。```')
+        await ctx.send(f'>>> {ctx.prefix}{ctx.invoked_with}入力時は必ずキーワードを指定してください。')
     
     @staticmethod
     async def no_img(ctx,keyword):
-        await ctx.send(content=f'`キーワード:{keyword}でファイルは登録されてません。`')
+        await ctx.send(content=f'>>> キーワード:{keyword}でファイルは登録されてません。')
 
 
 
@@ -62,7 +62,7 @@ class HelpCommand(commands.HelpCommand):
             for command in command_list:
                 content += f"{self.context.prefix}{command.name}  `{command.help}`\n"
             content += "\n"
-        embed = discord.Embed(title="**呼び出し君bot**",description=f'```discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。 \nコマンドの先頭には「{self.context.prefix}」を付けてください。```')
+        embed = discord.Embed(title="**呼び出し君bot**",description=f'>>> discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。 \n >>> コマンドの先頭には「{self.context.prefix}」を付けてください。')
         embed = embed.add_field(name="**コマンドリスト**",value=content)
 
         await self.get_destination().send(embed=embed)
