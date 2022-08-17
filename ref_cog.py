@@ -16,8 +16,8 @@ class ReferenceCommands(commands.Cog):
         登録一覧を表示
         '''
         embed = []
-        _id = ctx.guild.id
-        res = main.sql.registered_list(guild_id=_id)
+        guild_id = ctx.guild.id
+        res = main.sql.registered_list(guild_id=guild_id)
         if res:
             print(res,len(res))
             page = 1
@@ -59,8 +59,8 @@ class ReferenceCommands(commands.Cog):
                 return
             
             embed = []
-            _id = ctx.guild.id
-            res = main.sql.partial_match(guild_id=_id,keyword=args)
+            guild_id = ctx.guild.id
+            res = main.sql.partial_match(guild_id=guild_id,keyword=args)
             if res:
                 print(res,len(res))
                 page = 1
@@ -141,8 +141,8 @@ class ReferenceCommands(commands.Cog):
         登録数を表示
 
         '''
-        _id = ctx.guild.id
-        res = main.sql.registered_list(guild_id = _id)
+        guild_id = ctx.guild.id
+        res = main.sql.registered_list(guild_id = guild_id)
         # 登録がある場合は登録数を表示
         if res:
             await ctx.send(content=f'>>> このサーバーでの登録数は{len(res)}個です。')
