@@ -1,8 +1,7 @@
 from discord.ext import commands # Bot Commands Frameworkのインポート
-import discord
 from disputils.pagination import ControlEmojis
 import main as main
-
+import discord
 class BasicCommands(commands.Cog):
 
     def __init__(self, bot):
@@ -16,14 +15,15 @@ class BasicCommands(commands.Cog):
         新規登録/登録済みファイルの呼び出し
 
         '''
-        guild_id = ctx.guild.id
+        _id = ctx.guild.id
         
         if not arg:
             # キーワードが入力されていない場合はその旨を伝える
             await main.Msg.no_key(ctx)
         else:
             arg = ' '.join(arg)
-            res = main.sql.search_keyword(guild_id = guild_id,keyword = arg)
+            res = main.sql.search_keyword(guild_id = _id,keyword = arg)
+            print(res)
             if ctx.message.attachments:
                 if len(arg) > 20:
                      # キーワードが10文字以上の場合は拒否
@@ -31,12 +31,12 @@ class BasicCommands(commands.Cog):
                 
                 elif res:
                     # キーワードで登録がある場合は上書きするか尋ねる
-                    await ctx.send(content=f'>>> キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換える場合は {ctx.prefix}okと入力してください。置き換えない場合は{ctx.prefix}noと入力してください。\n{res["content"]}')
+                    await ctx.send(f'>>> キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換える場合は {ctx.prefix}okと入力してください。置き換えない場合は{ctx.prefix}noと入力してください。\n >>> {res["content"]}')
                     # 登録は１枚まで。
                     for attachment in ctx.message.attachments:
                         attachment = str(attachment)
-                        self.update_file[str(guild_id)] = [arg,attachment]
-                        print(self.update_file[str(guild_id)])
+                        self.update_file[str(_id)] = [arg,attachment]
+                        print(self.update_file[str(_id)])
                         break
                 
                 else:
@@ -44,8 +44,8 @@ class BasicCommands(commands.Cog):
                     # 登録は１枚まで。
                     for attachment in ctx.message.attachments:
                         attachment = str(attachment)
-                        main.sql.insert_dt(guild_id=guild_id,keyword=arg,content=attachment,userid=ctx.author.id)
-                        await ctx.send(content=f'>>> キーワード:{arg}でファイルを登録しました。')
+                        main.sql.insert_dt(guild_id=_id,keyword=arg,content=attachment,userid=ctx.author.id)
+                        await ctx.send(f'>>> キーワード:{arg}でファイルを登録しました。')
                         print(f'新規登録:{arg},url:{attachment},by{ctx.author.id}')
                         break
 
@@ -56,7 +56,7 @@ class BasicCommands(commands.Cog):
             
             else:
                 # アタッチメントが無く、登録がある場合は登録画像を表示
-                await ctx.send(content=f'{res["content"]}')
+                await ctx.send(f'{res["content"]}')
                 print(f'表示:{arg}')
             main.postc(arg)
 
@@ -65,13 +65,13 @@ class BasicCommands(commands.Cog):
         '''
         登録済みファイルの置き換え確認 OK
         '''
-        guild_id = ctx.guild.id
-        if str(guild_id) in self.update_file:
-            keyword = self.update_file[str(guild_id)][0]
-            attachment = self.update_file[str(guild_id)][1]
-            main.sql.update_dt(guild_id=guild_id, keyword=keyword, content=attachment, userid=ctx.author.id)
+        _id = ctx.guild.id
+        if str(_id) in self.update_file:
+            keyword = self.update_file[str(_id)][0]
+            attachment = self.update_file[str(_id)][1]
+            main.sql.update_dt(guild_id=_id, keyword=keyword, content=attachment, userid=ctx.author.id)
             await ctx.send(content=f'>>> キーワード:{keyword}の既存アタッチメントを指定ファイルで置き換えしました。')
-            del self.update_file[str(guild_id)]
+            del self.update_file[str(_id)]
         main.postc()
 
     @commands.command()
@@ -79,13 +79,13 @@ class BasicCommands(commands.Cog):
         '''
         登録済みファイルの置き換え確認　NO
         '''
-        guild_id = ctx.guild.id
-        if  str(guild_id) in self.update_file:
-            keyword = self.update_file[str(guild_id)][0]
+        _id = ctx.guild.id
+        if  str(_id) in self.update_file:
+            keyword = self.update_file[str(_id)][0]
             await ctx.send(content=f'>>> キーワード:{keyword}に登録された既存ファイルを指定されたファイルで置き換えしません。')
-            del self.update_file[str(guild_id)]
+            del self.update_file[str(_id)]
         main.postc(arg)
 
-def setup(bot):
+async def setup(bot: commands.Bot):
     print('BasicCommands読み込み')
-    return bot.add_cog(BasicCommands(bot))
+    await bot.add_cog(BasicCommands(bot))

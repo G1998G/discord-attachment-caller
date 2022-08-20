@@ -1,6 +1,6 @@
 from discord.ext import commands # Bot Commands Frameworkのインポート
 import discord
-from disputils import BotEmbedPaginator
+#from disputils import BotEmbedPaginator
 from disputils.pagination import ControlEmojis
 from typing import Union
 import main as main
@@ -10,18 +10,19 @@ class ReferenceCommands(commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.command(name="list")
-    async def pagenate(self,ctx,*arg):
+    @commands.command()
+    async def list(self,ctx,*arg):
         '''
         登録一覧を表示
         '''
-        embed = []
-        guild_id = ctx.guild.id
-        res = main.sql.registered_list(guild_id=guild_id)
+        embeds = []
+        _id = ctx.guild.id
+        res = main.sql.registered_list(guild_id=_id)
+        print(res)
         if res:
             print(res,len(res))
             page = 1
-            embed.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
+            embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
             if len(res) > 20:
                 q = len(res) // 20
                 mod = len(res) % 20
@@ -30,22 +31,23 @@ class ReferenceCommands(commands.Cog):
                 while x < q:
                     page += 1
                     content1 = res[_index:_index+20]
-                    embed.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
+                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
                     x +=1
                     _index += 20
                 if mod > 0:
                     page += 1
                     content2= res[_index:_index+mod-1]
-                    embed.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+            for embed in embeds:
+                await ctx.send(embed=embed)
+            
 
-            paginator = BotEmbedPaginator(ctx, pages=embed,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
-            await paginator.run(timeout_msg='>>> listコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。')
         else:
-            await ctx.send(content='>>> このサーバーでは何も登録がないようです。')
+            await ctx.send(content='>>> このサーバーでは何も登録がないようです。`')
         main.postc(arg)
 
-    @commands.command(name="search")
-    async def partialmatch(self,ctx,*args):
+    @commands.command()
+    async def search(self,ctx,*args):
         '''
         部分一致を含む検索
         '''
@@ -58,13 +60,13 @@ class ReferenceCommands(commands.Cog):
                 main.postc()
                 return
             
-            embed = []
-            guild_id = ctx.guild.id
-            res = main.sql.partial_match(guild_id=guild_id,keyword=args)
+            embeds = []
+            _id = ctx.guild.id
+            res = main.sql.search_keyword_partial(guild_id=_id,keyword=args)
             if res:
                 print(res,len(res))
                 page = 1
-                embed.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
+                embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
                 if len(res) > 20:
                     q = len(res) // 20
                     mod = len(res) % 20
@@ -73,16 +75,17 @@ class ReferenceCommands(commands.Cog):
                     while x < q:
                         page += 1
                         content1 = res[_index:_index+20]
-                        embed.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
+                        embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
                         x +=1
                         _index += 20
                     if mod > 0:
                         page += 1
                         content2= res[_index:_index+mod-1]
-                        embed.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+                        embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+                for embed in embeds:
+                    await ctx.send(embed=embed)                
 
-                paginator = BotEmbedPaginator(ctx, pages=embed,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
-                await paginator.run(timeout_msg='>>> searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。')
+
             else:
                 await ctx.send(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
         main.postc(args)
@@ -105,7 +108,7 @@ class ReferenceCommands(commands.Cog):
             return
 
         if res:
-            embed = []
+            embeds = []
             if not arg:
                 name = ctx.author.name
             elif type(arg) is discord.Member:
@@ -121,7 +124,7 @@ class ReferenceCommands(commands.Cog):
                 while x < q:
                     page += 1
                     content1 = res[_index:_index+20]
-                    embed.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
+                    embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
                     x +=1
                     _index += 20
                 if mod > 0:
@@ -129,10 +132,10 @@ class ReferenceCommands(commands.Cog):
                     content2= res[_index:_index+mod-1]
                     embed.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
 
-            paginator = BotEmbedPaginator(ctx, pages=embed,control_emojis=ControlEmojis(first='⏮', previous='◀', next='▶', last='⏭', close=None))
-            await paginator.run(timeout_msg='>>> searchコマンドは100秒間だけ表示&操作可能です。再度表示&操作したい場合はもう一度コマンドを実行してください。')
+            for embed in embeds:
+                await ctx.send(embed=embed)
         else:
-            await ctx.send(content= f'>>> ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。')
+            await ctx.send(f'>>> ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。')
         main.postc(arg)
 
     @commands.command()
@@ -141,14 +144,14 @@ class ReferenceCommands(commands.Cog):
         登録数を表示
 
         '''
-        guild_id = ctx.guild.id
-        res = main.sql.registered_list(guild_id = guild_id)
+        _id = ctx.guild.id
+        res = main.sql.registered_list(guild_id = _id)
         # 登録がある場合は登録数を表示
         if res:
-            await ctx.send(content=f'>>> このサーバーでの登録数は{len(res)}個です。')
+            await ctx.send(f'>>> このサーバーでの登録数は{len(res)}個です。')
         # キーワード登録がない場合はそのことを伝える。
         else:
-            await ctx.send(content=f'>>> このサーバーで登録はありません。')
+            await ctx.send(f'`このサーバーで登録はありません。`')
         main.postc(args)
 
     @commands.command()
@@ -161,6 +164,6 @@ class ReferenceCommands(commands.Cog):
         await ctx.send(embed=embed)
         main.postc(args)
 
-def setup(bot):
+async def setup(bot: commands.Bot):
     print('ReferenceCommands読み込み')
-    return bot.add_cog(ReferenceCommands(bot))
+    await bot.add_cog(ReferenceCommands(bot))
