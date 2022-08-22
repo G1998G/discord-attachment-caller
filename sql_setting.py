@@ -116,3 +116,16 @@ class SqlSet:
                 res.append(f'**`{row["keyword"]}`**\n')
             connection.close()
         return res  
+
+    def random_quote(self,guild_id):
+        with closing(sqlite3.connect(self.dbname)) as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            #SELECT * FROM idols ORDER BY RANDOM() LIMIT 10;
+            sql = 'SELECT * FROM discord_table1 WHERE guild_id= ? ORDER BY RANDOM() LIMIT 1'
+            data = (guild_id,)
+            cursor.execute(sql, data)
+            for row in cursor:
+                res = row["content"]
+            connection.close()
+        return res  
