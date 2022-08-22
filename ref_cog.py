@@ -159,6 +159,22 @@ class ReferenceCommands(commands.Cog):
         main.postc(args)
 
     @commands.command()
+    async def random(self,ctx,*args):
+        '''
+        サーバー登録からランダム表示
+
+        '''
+        _id = ctx.guild.id
+        res = main.sql.random_quote(guild_id = _id)
+        # 登録がある場合は表示
+        if res:
+            await ctx.reply(f'{res}')
+        # キーワード登録がない場合はそのことを伝える。
+        else:
+            await main.Msg.no_register_at_all(ctx)
+        main.postc(args)
+
+    @commands.command()
     async def profile(self,ctx,*args):
         '''
         bot作成者の紹介
