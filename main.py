@@ -68,7 +68,7 @@ class HelpCommand(commands.HelpCommand):
 
     
 
-async def main():
+async def main(bot):
     await bot.load_extension('basic_cog')
     await bot.load_extension('del_cog')
     await bot.load_extension('ref_cog')
@@ -77,7 +77,9 @@ async def main():
         print(f'🟠ログインしました🟠{len(bot.guilds)}ギルドにログイン')
     await bot.start(token='TOKEN')
 
-bot = commands.Bot(intents=discord.Intents.all(), command_prefix='!',help_command=HelpCommand())
-sql = sql_setting.SqlSet(dbname ='dbname',bot=bot)
+intents = discord.Intents
+intents.members = True
+bot = commands.Bot(intents=intents.all(), command_prefix='!',help_command=HelpCommand())
+sql = sql_setting.SqlSet(dbname ='dbname')
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(main(bot))

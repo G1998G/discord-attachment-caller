@@ -1,7 +1,5 @@
 from discord.ext import commands # Bot Commands Frameworkのインポート
 import discord
-#from disputils import BotEmbedPaginator
-from disputils.pagination import ControlEmojis
 from typing import Union
 import main as main
 
@@ -17,7 +15,7 @@ class ReferenceCommands(commands.Cog):
         '''
         embeds = []
         _id = ctx.guild.id
-        res = main.sql.registered_list(guild_id=_id)
+        res = main.sql.registered_list(guild_id=_id,bot=self.bot)
         print(res)
         if res:
             print(res,len(res))
@@ -62,7 +60,7 @@ class ReferenceCommands(commands.Cog):
             
             embeds = []
             _id = ctx.guild.id
-            res = main.sql.search_keyword_partial(guild_id=_id,keyword=args)
+            res = main.sql.search_keyword_partial(guild_id=_id,keyword=args,bot=self.bot)
             if res:
                 print(res,len(res))
                 page = 1
@@ -88,7 +86,7 @@ class ReferenceCommands(commands.Cog):
 
             else:
                 await ctx.send(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
-        main.postc(args)
+                await main.postc(args)
 
     @commands.command()
     async def author(self,ctx,arg: Union[discord.Member,int,str,None]):
@@ -102,7 +100,8 @@ class ReferenceCommands(commands.Cog):
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=ctx.author.id)
         elif type(arg) is discord.Member:
             print(type(arg))
-            res = main.search_author(guild_id=ctx.guild.id,userid=arg.id)
+            res = main.sql.search_author(guild_id=ctx.guild.id,userid=arg.id)
+            print(res)
         else:
             await ctx.send(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
             return
@@ -115,7 +114,7 @@ class ReferenceCommands(commands.Cog):
                 name = arg.name
             print(f'{res}項目数:{len(res)}')
             page = 1
-            embed.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
+            embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
             if len(res) > 20:
                 q = len(res) // 20
                 mod = len(res) % 20
@@ -130,7 +129,7 @@ class ReferenceCommands(commands.Cog):
                 if mod > 0:
                     page += 1
                     content2= res[_index:_index+mod-1]
-                    embed.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+                    embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
 
             for embed in embeds:
                 await ctx.send(embed=embed)

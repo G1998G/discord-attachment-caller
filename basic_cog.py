@@ -1,5 +1,4 @@
 from discord.ext import commands # Bot Commands Frameworkのインポート
-from disputils.pagination import ControlEmojis
 import main as main
 import discord
 class BasicCommands(commands.Cog):

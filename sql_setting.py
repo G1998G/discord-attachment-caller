@@ -3,9 +3,9 @@ from contextlib import closing
 
 class SqlSet:
 
-    def __init__(self,dbname,bot):
+    def __init__(self,dbname):
         self.dbname = dbname
-        self.bot = bot
+
         with closing(sqlite3.connect(self.dbname)) as connection:
             cursor = connection.cursor()
             # テーブルを作成
@@ -73,7 +73,7 @@ class SqlSet:
         return res
                 
 
-    def registered_list(self,guild_id):
+    def registered_list(self,bot,guild_id):
         res = list()
         with closing(sqlite3.connect(self.dbname)) as connection:
             connection.row_factory = sqlite3.Row
@@ -82,11 +82,13 @@ class SqlSet:
             data = (guild_id,)
             cursor.execute(sql, data)
             for row in cursor:
-                res.append(f'**`{row["keyword"]}`** _`{self.bot.get_user(row["userid"]).name}`_\n')
+                userid = int(row["userid"])
+                user = bot.get_user(userid)
+                res.append(f'**`{row["keyword"]}`** {user.display_name}\n')
             connection.close()
-        return res  
+            return res  
 
-    def partial_match(self,guild_id,keyword):
+    def search_keyword_partial(self,bot,guild_id,keyword):
         res = list()
         keyword = f'%{keyword}%'
         with closing(sqlite3.connect(self.dbname)) as connection:
@@ -96,9 +98,11 @@ class SqlSet:
             data = (guild_id,keyword)
             cursor.execute(sql, data)
             for row in cursor:
-                res.append(f'**`{row["keyword"]}`** _`{self.bot.get_user(row["userid"]).name}`_\n')
+                userid = int(row["userid"])
+                user = bot.get_user(userid)
+                res.append(f'**`{row["keyword"]}`** {user.display_name}\n')
             connection.close()
-        return res  
+            return res  
 
     def search_author(self,guild_id,userid):
         res = list()
