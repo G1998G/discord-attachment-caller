@@ -23,7 +23,7 @@ class DeleteCommands(commands.Cog):
 
             res = main.sql.search_keyword(guild_id = _id,keyword = arg)
             if res:
-                await ctx.reply(f'>>> キーワード:{arg}に登録されたこのファイルを削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。\n >>> {res["content"]}')
+                await ctx.reply(f'>>> キーワード:{arg}に登録されたこのファイルを削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。\n {res["content"]}')
                 self.deletekeyword[str(_id)] = arg
             else:
                 await main.Msg.no_img(ctx,arg)
