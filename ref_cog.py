@@ -37,7 +37,7 @@ class ReferenceCommands(commands.Cog):
                     content2= res[_index:_index+mod-1]
                     embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
             for embed in embeds:
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed)
             
 
         else:
@@ -81,11 +81,11 @@ class ReferenceCommands(commands.Cog):
                         content2= res[_index:_index+mod-1]
                         embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
                 for embed in embeds:
-                    await ctx.send(embed=embed)                
+                    await ctx.reply(embed=embed)                
 
 
             else:
-                await ctx.send(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
+                await ctx.reply(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
                 await main.postc(args)
 
     @commands.command()
@@ -102,7 +102,7 @@ class ReferenceCommands(commands.Cog):
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=arg.id)
             print(res)
         else:
-            await ctx.send(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
+            await ctx.reply(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
             return
 
         if not res:
@@ -110,7 +110,7 @@ class ReferenceCommands(commands.Cog):
                 name = arg.name
             else:
                 name = ctx.author.name
-            await ctx.send(f'>>> ユーザー名:{name}で検索した結果、ヒット件数0件でした。')
+            await ctx.reply(f'>>> ユーザー名:{name}で検索した結果、ヒット件数0件でした。')
 
         elif res:
             embeds = []
@@ -138,7 +138,7 @@ class ReferenceCommands(commands.Cog):
                     embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
 
             for embed in embeds:
-                await ctx.send(embed=embed)
+                await ctx.reply(embed=embed)
 
         main.postc(arg)
 
@@ -181,7 +181,7 @@ class ReferenceCommands(commands.Cog):
         '''
         embed= discord.Embed(title="**bot作成者**", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
         embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
         main.postc(args)
 
 async def setup(bot: commands.Bot):

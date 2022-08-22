@@ -24,19 +24,19 @@ class Msg:
 
     @staticmethod
     async def len_over(ctx):
-        await ctx.send(f'>>> キーワードはスペース含め20文字以内で入力してください。')
+        await ctx.reply(f'>>> キーワードはスペース含め20文字以内で入力してください。')
     
     @staticmethod
     async def no_key(ctx):
-        await ctx.send(f'>>> {ctx.prefix}{ctx.invoked_with}入力時は必ずキーワードを指定してください。')
+        await ctx.reply(f'>>> {ctx.prefix}{ctx.invoked_with}入力時は必ずキーワードを指定してください。')
     
     @staticmethod
     async def no_img(ctx,keyword):
-        await ctx.send(f'>>> キーワード:{keyword}でファイルは登録されてません。')
+        await ctx.reply(f'>>> キーワード:{keyword}でファイルは登録されてません。')
 
     @staticmethod
     async def no_register_at_all(ctx):
-        await ctx.send(f'>>> このサーバーでは何も登録がないようです。')
+        await ctx.reply(f'>>> このサーバーでは何も登録がないようです。')
 
 
 

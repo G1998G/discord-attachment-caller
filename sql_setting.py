@@ -56,6 +56,7 @@ class SqlSet:
             connection.commit()
             connection.close()
 
+    # キーワード全一致で検索
     def search_keyword(self,guild_id,keyword):
         res = dict()
         with closing(sqlite3.connect(self.dbname)) as connection:
