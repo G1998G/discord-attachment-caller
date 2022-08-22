@@ -119,6 +119,7 @@ class SqlSet:
         return res  
 
     def random_quote(self,guild_id):
+        res =list()
         with closing(sqlite3.connect(self.dbname)) as connection:
             connection.row_factory = sqlite3.Row
             cursor = connection.cursor()
@@ -127,6 +128,6 @@ class SqlSet:
             data = (guild_id,)
             cursor.execute(sql, data)
             for row in cursor:
-                res = row["content"]
+                res.append(f'{"".join(row["content"])}')
             connection.close()
         return res  
