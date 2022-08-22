@@ -94,8 +94,7 @@ class ReferenceCommands(commands.Cog):
         指定ユーザーの登録一覧を表示。無指定の場合書き込み者の登録一覧
 
         '''
-        print(f'{ctx.author.id}')
-        if arg is None :
+        if not arg:
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=ctx.author.id)
             print(res)
         elif type(arg) is discord.Member:
@@ -107,7 +106,11 @@ class ReferenceCommands(commands.Cog):
             return
 
         if not res:
-            await ctx.send(f'>>> ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。')
+            if arg:
+                name = arg.name
+            else:
+                name = ctx.author.name
+            await ctx.send(f'>>> ユーザー名:{name}で検索した結果、ヒット件数0件でした。')
 
         elif res:
             embeds = []
