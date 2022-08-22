@@ -85,7 +85,7 @@ class SqlSet:
             for row in cursor:
                 userid = int(row["userid"])
                 user = bot.get_user(userid)
-                res.append(f'**`{row["keyword"]}`** {user.display_name}\n')
+                res.append(f'{row["keyword"]}    `{user.display_name}`\n')
             connection.close()
             return res  
 
@@ -101,7 +101,7 @@ class SqlSet:
             for row in cursor:
                 userid = int(row["userid"])
                 user = bot.get_user(userid)
-                res.append(f'**`{row["keyword"]}`** {user.display_name}\n')
+                res.append(f'{row["keyword"]}    `{user.display_name}` \n')
             connection.close()
             return res  
 

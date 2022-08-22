@@ -162,7 +162,7 @@ class ReferenceCommands(commands.Cog):
         '''
         bot作成者の紹介
         '''
-        embed= discord.Embed(title="**bot作成者**", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
+        embed= discord.Embed(title="bot作成者", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
         embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
         await ctx.reply(embed=embed)
         main.postc(args)
