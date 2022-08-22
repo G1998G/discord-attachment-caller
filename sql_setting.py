@@ -128,6 +128,6 @@ class SqlSet:
             data = (guild_id,)
             cursor.execute(sql, data)
             for row in cursor:
-                res.append(f'{"".join(row["content"])}')
+                res.append(f'{row["content"]}')
             connection.close()
         return res  

@@ -168,7 +168,7 @@ class ReferenceCommands(commands.Cog):
         res = main.sql.random_quote(guild_id = _id)
         # 登録がある場合は表示
         if res:
-            await ctx.reply(f'{res}')
+            await ctx.reply(f'{"".join(res)}')
         # キーワード登録がない場合はそのことを伝える。
         else:
             await main.Msg.no_register_at_all(ctx)
