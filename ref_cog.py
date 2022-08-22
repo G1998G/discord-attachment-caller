@@ -3,6 +3,28 @@ import discord
 from typing import Union
 import main as main
 
+
+#リストを分割する関数
+def ls_split(ls):
+    
+    #配列の要素数をカウント
+    length = len(ls)
+    #開始位置を指定
+    n = 0
+    #分割する変数の個数を指定
+    s = 20
+    #分割したリストを格納
+    splited_ls = list()
+    #配列を指定した個数で分割していくループ処理
+    for i in ls:
+        splited_ls.append(ls[n:n+s:1])
+        n += s
+        #カウント数が配列の長さを超えたらループ終了
+        if n >= length:
+            break
+    return splited_ls
+
+
 class ReferenceCommands(commands.Cog):
     def __init__(self, bot):
         super().__init__()
@@ -13,29 +35,17 @@ class ReferenceCommands(commands.Cog):
         '''
         登録一覧を表示
         '''
-        embeds = []
+        
         _id = ctx.guild.id
         res = main.sql.registered_list(guild_id=_id,bot=self.bot)
-        print(res)
+
         if res:
-            print(res,len(res))
-            page = 1
-            embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
-            if len(res) > 20:
-                q = len(res) // 20
-                mod = len(res) % 20
-                x = 1
-                _index = 20
-                while x < q:
-                    page += 1
-                    content1 = res[_index:_index+20]
-                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
-                    x +=1
-                    _index += 20
-                if mod > 0:
-                    page += 1
-                    content2= res[_index:_index+mod-1]
-                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+            embeds = []
+            ls = ls_split(res)
+            page = 0
+            for l in ls:
+                page +=1
+                embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(l)}") )
             for embed in embeds:
                 await ctx.reply(embed=embed)
             
@@ -57,31 +67,18 @@ class ReferenceCommands(commands.Cog):
                 await main.Msg.len_over(ctx)
                 main.postc()
                 return
-            
-            embeds = []
+
             _id = ctx.guild.id
             res = main.sql.search_keyword_partial(guild_id=_id,keyword=args,bot=self.bot)
             if res:
-                print(res,len(res))
-                page = 1
-                embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
-                if len(res) > 20:
-                    q = len(res) // 20
-                    mod = len(res) % 20
-                    x = 1
-                    _index = 20
-                    while x < q:
-                        page += 1
-                        content1 = res[_index:_index+20]
-                        embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
-                        x +=1
-                        _index += 20
-                    if mod > 0:
-                        page += 1
-                        content2= res[_index:_index+mod-1]
-                        embeds.append( discord.Embed(title=f"「{args}」\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
+                embeds = []
+                ls = ls_split(res)
+                page = 0
+                for l in ls:
+                    page +=1
+                    embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(l)}") )
                 for embed in embeds:
-                    await ctx.reply(embed=embed)                
+                    await ctx.reply(embed=embed)               
 
 
             else:
@@ -96,11 +93,9 @@ class ReferenceCommands(commands.Cog):
         '''
         if not arg:
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=ctx.author.id)
-            print(res)
         elif type(arg) is discord.Member:
             print(type(arg))
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=arg.id)
-            print(res)
         else:
             await ctx.reply(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
             return
@@ -118,27 +113,15 @@ class ReferenceCommands(commands.Cog):
                 name = ctx.author.name
             elif type(arg) is discord.Member:
                 name = arg.name
-            print(f'{res}項目数:{len(res)}')
-            page = 1
-            embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(res[0:19])}") )
-            if len(res) > 20:
-                q = len(res) // 20
-                mod = len(res) % 20
-                x = 1
-                _index = 20
-                while x < q:
-                    page += 1
-                    content1 = res[_index:_index+20]
-                    embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{' '.join(content1)}") )
-                    x +=1
-                    _index += 20
-                if mod > 0:
-                    page += 1
-                    content2= res[_index:_index+mod-1]
-                    embeds.append( discord.Embed(title=f"{name} さんの登録\n 検索結果(登録数:{len(res)}) {page}ページ目",description=f"{''.join(content2)}") )
-
-            for embed in embeds:
-                await ctx.reply(embed=embed)
+            if res:
+                embeds = []
+                ls = ls_split(res)
+                page = 0
+                for l in ls:
+                    page +=1
+                    embeds.append( discord.Embed(title=f"{name}さんの登録一覧\n(登録数:{len(res)}) {page}ページ目",description=f"{''.join(l)}") )
+                for embed in embeds:
+                    await ctx.reply(embed=embed)  
 
         main.postc(arg)
 
