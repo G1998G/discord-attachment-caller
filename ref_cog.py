@@ -96,8 +96,8 @@ class ReferenceCommands(commands.Cog):
         '''
         print(f'{ctx.author.id}')
         if arg is None :
-            print(f'Noneが入力されました')
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=ctx.author.id)
+            print(res)
         elif type(arg) is discord.Member:
             print(type(arg))
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=arg.id)
@@ -106,7 +106,10 @@ class ReferenceCommands(commands.Cog):
             await ctx.send(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
             return
 
-        if res:
+        if not res:
+            await ctx.send(f'>>> ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。')
+
+        elif res:
             embeds = []
             if not arg:
                 name = ctx.author.name
@@ -133,8 +136,7 @@ class ReferenceCommands(commands.Cog):
 
             for embed in embeds:
                 await ctx.send(embed=embed)
-        else:
-            await ctx.send(f'>>> ユーザー名:{arg.name or ctx.author.id}で検索した結果、ヒット件数0件でした。')
+
         main.postc(arg)
 
     @commands.command()
