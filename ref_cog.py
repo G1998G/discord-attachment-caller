@@ -41,7 +41,7 @@ class ReferenceCommands(commands.Cog):
             
 
         else:
-            await ctx.send(content='>>> このサーバーでは何も登録がないようです。`')
+            await main.Msg.no_register_at_all(ctx)
         main.postc(arg)
 
     @commands.command()
@@ -152,7 +152,7 @@ class ReferenceCommands(commands.Cog):
             await ctx.send(f'>>> このサーバーでの登録数は{len(res)}個です。')
         # キーワード登録がない場合はそのことを伝える。
         else:
-            await ctx.send(f'`このサーバーで登録はありません。`')
+            await main.Msg.no_register_at_all(ctx)
         main.postc(args)
 
     @commands.command()

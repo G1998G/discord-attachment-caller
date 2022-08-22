@@ -34,6 +34,10 @@ class Msg:
     async def no_img(ctx,keyword):
         await ctx.send(f'>>> キーワード:{keyword}でファイルは登録されてません。')
 
+    @staticmethod
+    async def no_register_at_all(ctx):
+        await ctx.send(f'>>> このサーバーでは何も登録がないようです。')
+
 
 
 class HelpCommand(commands.HelpCommand):
