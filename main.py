@@ -9,13 +9,6 @@ class C:
         self.x = 0
     def __call__(self,ctx,*arg : tuple):
         self.x += 1
-        if arg is tuple :
-            arg = ''.join(arg)
-
-        elif arg is str or int:
-            pass
-        else:
-            arg =" -コマンド引数なし"
         return print(f'コマンド受け取り🟢{self.x}回目　コマンド名:{ctx.invoked_with} コマンド引数:{arg}')
 postc = C()
 
@@ -79,7 +72,7 @@ async def main(bot):
     @bot.event
     async def on_ready():
         print(f'🟠ログインしました🟠{len(bot.guilds)}ギルドにログイン')
-    await bot.start(token='ODI4NjIzMzEwNzY5NjE4OTY0.GKCHpM.3ri4Q3fKW604mSC1gXy3DqzAICzhEhFsSgBwBg')
+    await bot.start(token='TOKEN')
 
 intents = discord.Intents
 intents.members = True
