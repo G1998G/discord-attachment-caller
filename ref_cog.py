@@ -30,6 +30,16 @@ class ReferenceCommands(commands.Cog):
         super().__init__()
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        print(f'🟠ログインギルドが増えました🟠{len(self.bot.guilds)}ギルドにログイン')
+    @commands.Cog.listener()
+    async def on_guild_remove(self,guild):
+        print(f'🟠ログインギルドが減りました🟠{len(self.bot.guilds)}ギルドにログイン') 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f'🟠ログインしました🟠{len(self.bot.guilds)}ギルドにログイン')
+
     @commands.command()
     async def list(self,ctx,*arg):
         '''
