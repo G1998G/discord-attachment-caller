@@ -29,7 +29,7 @@ class DeleteCommands(commands.Cog):
                 await main.Msg.no_img(ctx,arg)
         else:
             await main.Msg.no_key(ctx)
-        main.postc(arg)
+        main.postc(ctx,arg)
 
     @commands.command()
     async def delok(self,ctx,*arg):
@@ -44,7 +44,7 @@ class DeleteCommands(commands.Cog):
             del self.deletekeyword[str(_id)]
         else:
             await ctx.reply(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する登録を指定してください')
-        main.postc(arg)
+        main.postc(ctx,arg)
 
     @commands.command()
     async def delno(self,ctx,*arg):
@@ -58,7 +58,7 @@ class DeleteCommands(commands.Cog):
             del self.deletekeyword[str(_id)]
         else:
             await ctx.reply(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}del キーワードで削除する登録を指定してください')
-        main.postc(arg)
+        main.postc(ctx,arg)
 
 async def setup(bot:commands.Bot):
     print(f'DeleteCommands読み込み')

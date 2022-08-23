@@ -57,7 +57,7 @@ class BasicCommands(commands.Cog):
                 # アタッチメントが無く、登録がある場合は登録画像を表示
                 await ctx.reply(f'{res["content"]}')
                 print(f'表示:{arg}')
-            main.postc(arg)
+        main.postc(ctx,arg)
 
     @commands.command()
     async def ok(self,ctx,*arg):
@@ -71,7 +71,7 @@ class BasicCommands(commands.Cog):
             main.sql.update_dt(guild_id=_id, keyword=keyword, content=attachment, userid=ctx.author.id)
             await ctx.reply(content=f'>>> キーワード:{keyword}の既存アタッチメントを指定ファイルで置き換えしました。')
             del self.update_file[str(_id)]
-        main.postc()
+        main.postc(ctx=ctx)
 
     @commands.command()
     async def no(self,ctx,*arg):
@@ -83,7 +83,7 @@ class BasicCommands(commands.Cog):
             keyword = self.update_file[str(_id)][0]
             await ctx.reply(content=f'>>> キーワード:{keyword}に登録された既存ファイルを指定されたファイルで置き換えしません。')
             del self.update_file[str(_id)]
-        main.postc(arg)
+        main.postc(ctx,arg)
 
 async def setup(bot: commands.Bot):
     print('BasicCommands読み込み')

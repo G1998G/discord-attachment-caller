@@ -52,7 +52,7 @@ class ReferenceCommands(commands.Cog):
 
         else:
             await main.Msg.no_register_at_all(ctx)
-        main.postc(arg)
+        main.postc(ctx,arg)
 
     @commands.command()
     async def search(self,ctx,*args):
@@ -83,7 +83,7 @@ class ReferenceCommands(commands.Cog):
 
             else:
                 await ctx.reply(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
-                await main.postc(args)
+        main.postc(ctx,args)
 
     @commands.command()
     async def author(self,ctx,arg: Union[discord.Member,int,str,None]):
@@ -123,7 +123,7 @@ class ReferenceCommands(commands.Cog):
                 for embed in embeds:
                     await ctx.reply(embed=embed)  
 
-        main.postc(arg)
+        main.postc(ctx,arg)
 
     @commands.command()
     async def count(self,ctx,*args):
@@ -139,7 +139,7 @@ class ReferenceCommands(commands.Cog):
         # キーワード登録がない場合はそのことを伝える。
         else:
             await main.Msg.no_register_at_all(ctx)
-        main.postc(args)
+        main.postc(ctx,args)
 
     @commands.command()
     async def random(self,ctx,*args):
@@ -155,7 +155,7 @@ class ReferenceCommands(commands.Cog):
         # キーワード登録がない場合はそのことを伝える。
         else:
             await main.Msg.no_register_at_all(ctx)
-        main.postc(args)
+        main.postc(ctx,args)
 
     @commands.command()
     async def profile(self,ctx,*args):
@@ -165,7 +165,7 @@ class ReferenceCommands(commands.Cog):
         embed= discord.Embed(title="bot作成者", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
         embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
         await ctx.reply(embed=embed)
-        main.postc(args)
+        main.postc(ctx,args)
 
 async def setup(bot: commands.Bot):
     print('ReferenceCommands読み込み')

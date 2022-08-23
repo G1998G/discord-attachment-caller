@@ -7,7 +7,7 @@ import asyncio
 class C:
     def __init__(self):
         self.x = 0
-    def __call__(self,*arg : tuple):
+    def __call__(self,ctx,*arg : tuple):
         self.x += 1
         if arg is tuple :
             arg = ''.join(arg)
@@ -16,7 +16,7 @@ class C:
             pass
         else:
             arg =" -コマンド引数なし"
-        return print(f'コマンド受け取り🟢{self.x}回目　コマンド引数:{arg}')
+        return print(f'コマンド受け取り🟢{self.x}回目　コマンド名:{ctx.invoked_with} コマンド引数:{arg}')
 postc = C()
 
 
@@ -68,7 +68,7 @@ class HelpCommand(commands.HelpCommand):
         embed = embed.add_field(name="**コマンドリスト**",value=content)
 
         await self.get_destination().send(embed=embed)
-        postc()
+        postc(self.context)
 
     
 
