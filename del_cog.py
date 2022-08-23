@@ -23,7 +23,7 @@ class DeleteCommands(commands.Cog):
 
             res = main.sql.search_keyword(guild_id = _id,keyword = arg)
             if res:
-                await ctx.reply(f'>>> キーワード:{arg}に登録されたこのファイルを削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。\n {res["content"]}')
+                await ctx.send(f'>>> キーワード:{arg}に登録されたこのファイルを削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。\n {res["content"]}')
                 self.deletekeyword[str(_id)] = arg
             else:
                 await main.Msg.no_img(ctx,arg)
@@ -40,10 +40,10 @@ class DeleteCommands(commands.Cog):
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
             main.sql.delete_dt(guild_id=_id, keyword=keyword)
-            await ctx.reply(f'>>> キーワード:{keyword}に登録されたファイルを削除しました。')
+            await ctx.send(f'>>> キーワード:{keyword}に登録されたファイルを削除しました。')
             del self.deletekeyword[str(_id)]
         else:
-            await ctx.reply(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する登録を指定してください')
+            await ctx.send(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する登録を指定してください')
         main.postc(ctx,arg)
 
     @commands.command()
@@ -54,10 +54,10 @@ class DeleteCommands(commands.Cog):
         _id = ctx.guild.id
         if str(_id) in self.deletekeyword:
             keyword = self.deletekeyword[str(_id)]
-            await ctx.reply(f'>>> キーワード:{keyword}に登録されたファイルを削除しません。')
+            await ctx.send(f'>>> キーワード:{keyword}に登録されたファイルを削除しません。')
             del self.deletekeyword[str(_id)]
         else:
-            await ctx.reply(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}del キーワードで削除する登録を指定してください')
+            await ctx.send(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}del キーワードで削除する登録を指定してください')
         main.postc(ctx,arg)
 
 async def setup(bot:commands.Bot):

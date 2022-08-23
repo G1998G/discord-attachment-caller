@@ -57,7 +57,7 @@ class ReferenceCommands(commands.Cog):
                 page +=1
                 embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(l)}") )
             for embed in embeds:
-                await ctx.reply(embed=embed)
+                await ctx.send(embed=embed)
             
 
         else:
@@ -88,11 +88,11 @@ class ReferenceCommands(commands.Cog):
                     page +=1
                     embeds.append( discord.Embed(title=f"登録一覧(登録数:{len(res)}) {page}ページ目",description=f"{''.join(l)}") )
                 for embed in embeds:
-                    await ctx.reply(embed=embed)               
+                    await ctx.send(embed=embed)               
 
 
             else:
-                await ctx.reply(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
+                await ctx.send(content= f'>>> キーワード:{args} で部分一致含む検索をした結果、ヒット件数0件でした。')
         main.postc(ctx,args)
 
     @commands.command()
@@ -107,7 +107,7 @@ class ReferenceCommands(commands.Cog):
             print(type(arg))
             res = main.sql.search_author(guild_id=ctx.guild.id,userid=arg.id)
         else:
-            await ctx.reply(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
+            await ctx.send(f'>>> 検索するユーザーを１ユーザーのみ指定するか、貴方自身を検索する場合は何も入力しないでください。')
             return
 
         if not res:
@@ -115,7 +115,7 @@ class ReferenceCommands(commands.Cog):
                 name = arg.name
             else:
                 name = ctx.author.name
-            await ctx.reply(f'>>> ユーザー名:{name}で検索した結果、ヒット件数0件でした。')
+            await ctx.send(f'>>> ユーザー名:{name}で検索した結果、ヒット件数0件でした。')
 
         elif res:
             embeds = []
@@ -131,7 +131,7 @@ class ReferenceCommands(commands.Cog):
                     page +=1
                     embeds.append( discord.Embed(title=f"{name}さんの登録一覧\n(登録数:{len(res)}) {page}ページ目",description=f"{''.join(l)}") )
                 for embed in embeds:
-                    await ctx.reply(embed=embed)  
+                    await ctx.send(embed=embed)  
 
         main.postc(ctx,arg)
 
@@ -161,7 +161,7 @@ class ReferenceCommands(commands.Cog):
         res = main.sql.random_quote(guild_id = _id)
         # 登録がある場合は表示
         if res:
-            await ctx.reply(f'{"".join(res)}')
+            await ctx.send(f'{"".join(res)}')
         # キーワード登録がない場合はそのことを伝える。
         else:
             await main.Msg.no_register_at_all(ctx)
@@ -174,7 +174,7 @@ class ReferenceCommands(commands.Cog):
         '''
         embed= discord.Embed(title="bot作成者", description=f"趣味でbot等を作っています。\n [GitHubプロフィールページ](https://github.com/G1998G)")
         embed.set_thumbnail(url="https://avatars.githubusercontent.com/u/60283066?s=400&v=4")
-        await ctx.reply(embed=embed)
+        await ctx.send(embed=embed)
         main.postc(ctx,args)
 
 async def setup(bot: commands.Bot):

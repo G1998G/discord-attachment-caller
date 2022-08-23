@@ -69,7 +69,7 @@ async def main(bot):
     await bot.load_extension('basic_cog')
     await bot.load_extension('del_cog')
     await bot.load_extension('ref_cog')
-    await bot.start(token='token')
+    await bot.start(token='TOKEN')
 
 intents = discord.Intents
 intents.members = True
