@@ -65,7 +65,7 @@ class ReferenceCommands(commands.Cog):
             args = ' '.join(args)
             if len(args) > 20:
                 await main.Msg.len_over(ctx)
-                main.postc()
+                main.postc(ctx)
                 return
 
             _id = ctx.guild.id
