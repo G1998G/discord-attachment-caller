@@ -37,7 +37,7 @@ class ReferenceCommands(commands.Cog):
         '''
         
         _id = ctx.guild.id
-        res = main.sql.registered_list(guild_id=_id,bot=self.bot)
+        res = main.sql.guild_registrations(guild_id=_id,bot=self.bot)
 
         if res:
             embeds = []
