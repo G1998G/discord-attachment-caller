@@ -28,7 +28,7 @@ class DeleteCommands(commands.Cog):
             else:
                 await main.Msg.no_img(ctx,arg)
         else:
-            await main.Msg.no_key(ctx)
+            await main.Msg.no_arg(ctx)
         main.postc(ctx,arg)
 
     @commands.command()

@@ -18,7 +18,7 @@ class BasicCommands(commands.Cog):
         
         if not arg:
             # キーワードが入力されていない場合はその旨を伝える
-            await main.Msg.no_key(ctx)
+            await main.Msg.no_arg(ctx)
         else:
             arg = ' '.join(arg)
             res = main.sql.search_keyword(guild_id = _id,keyword = arg)

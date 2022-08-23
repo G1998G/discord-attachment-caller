@@ -27,7 +27,7 @@ class Msg:
         await ctx.reply(f'>>> キーワードはスペース含め20文字以内で入力してください。')
     
     @staticmethod
-    async def no_key(ctx):
+    async def no_arg(ctx):
         await ctx.reply(f'>>> {ctx.prefix}{ctx.invoked_with}入力時は必ずキーワードを指定してください。')
     
     @staticmethod
@@ -79,7 +79,7 @@ async def main(bot):
     @bot.event
     async def on_ready():
         print(f'🟠ログインしました🟠{len(bot.guilds)}ギルドにログイン')
-    await bot.start(token='TOKEN')
+    await bot.start(token='ODI4NjIzMzEwNzY5NjE4OTY0.GKCHpM.3ri4Q3fKW604mSC1gXy3DqzAICzhEhFsSgBwBg')
 
 intents = discord.Intents
 intents.members = True

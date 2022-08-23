@@ -60,7 +60,7 @@ class ReferenceCommands(commands.Cog):
         部分一致を含む検索
         '''
         if not args:
-            await main.Msg.no_key(ctx)
+            await main.Msg.no_arg(ctx)
         else:
             args = ' '.join(args)
             if len(args) > 20:
