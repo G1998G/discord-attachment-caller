@@ -69,16 +69,7 @@ async def main(bot):
     await bot.load_extension('basic_cog')
     await bot.load_extension('del_cog')
     await bot.load_extension('ref_cog')
-    @bot.event
-    async def on_ready():
-        print(f'🟠ログインしました🟠{len(bot.guilds)}ギルドにログイン')
-    @bot.event
-    async def on_guild_join():
-        print(f'🟠ログインギルドが増えました🟠{len(bot.guilds)}ギルドにログイン')
-    @bot.event
-    async def on_guild_remove():
-        print(f'🟠ログインギルドが減りました🟠{len(bot.guilds)}ギルドにログイン')       
-    await bot.start(token='TOKEN')
+    await bot.start(token='token')
 
 intents = discord.Intents
 intents.members = True
