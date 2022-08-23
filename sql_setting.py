@@ -5,7 +5,6 @@ class SqlSet:
 
     def __init__(self,dbname):
         self.dbname = dbname
-
         with closing(sqlite3.connect(self.dbname)) as connection:
             cursor = connection.cursor()
             # テーブルを作成
@@ -74,7 +73,7 @@ class SqlSet:
         return res
                 
 
-    def guild_registrations(self,bot,guild_id):
+    def registrations_in_guild(self,bot,guild_id):
         res = list()
         with closing(sqlite3.connect(self.dbname)) as connection:
             connection.row_factory = sqlite3.Row

@@ -37,7 +37,7 @@ class ReferenceCommands(commands.Cog):
         '''
         
         _id = ctx.guild.id
-        res = main.sql.guild_registrations(guild_id=_id,bot=self.bot)
+        res = main.sql.registrations_in_guild(guild_id=_id,bot=self.bot)
 
         if res:
             embeds = []
@@ -132,7 +132,7 @@ class ReferenceCommands(commands.Cog):
 
         '''
         _id = ctx.guild.id
-        res = main.sql.guild_registrations(guild_id = _id,bot=self.bot)
+        res = main.sql.registrations_in_guild(guild_id = _id,bot=self.bot)
         # 登録がある場合は登録数を表示
         if res:
             await ctx.send(f'>>> このサーバーでの登録数は{len(res)}個です。')
