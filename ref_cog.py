@@ -51,7 +51,7 @@ class ReferenceCommands(commands.Cog):
             
 
         else:
-            await main.Msg.no_register_at_all(ctx)
+            await main.Msg.no_registration_in_guild(ctx)
         main.postc(ctx,arg)
 
     @commands.command()
@@ -132,13 +132,13 @@ class ReferenceCommands(commands.Cog):
 
         '''
         _id = ctx.guild.id
-        res = main.sql.registered_list(guild_id = _id,bot=self.bot)
+        res = main.sql.guild_registrations(guild_id = _id,bot=self.bot)
         # 登録がある場合は登録数を表示
         if res:
             await ctx.send(f'>>> このサーバーでの登録数は{len(res)}個です。')
         # キーワード登録がない場合はそのことを伝える。
         else:
-            await main.Msg.no_register_at_all(ctx)
+            await main.Msg.no_registration_in_guild(ctx)
         main.postc(ctx,args)
 
     @commands.command()

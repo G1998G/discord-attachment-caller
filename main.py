@@ -35,7 +35,7 @@ class Msg:
         await ctx.reply(f'>>> キーワード:{keyword}でファイルは登録されてません。')
 
     @staticmethod
-    async def no_register_at_all(ctx):
+    async def no_registration_in_guild(ctx):
         await ctx.reply(f'>>> このサーバーでは何も登録がないようです。')
 
 
@@ -64,7 +64,7 @@ class HelpCommand(commands.HelpCommand):
             for command in command_list:
                 content += f"{self.context.prefix}{command.name}  `{command.help}`\n"
             content += "\n"
-        embed = discord.Embed(title="**呼び出し君bot**",description=f' discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。 \n コマンドの先頭には「{self.context.prefix}」を付けてください。')
+        embed = discord.Embed(title="📢呼び出し君bot",description=f' discordにアップロードしたファイルをいつでも呼び出せるようにしたbotです。 \n コマンドの先頭には「{self.context.prefix}」を付けてください。')
         embed = embed.add_field(name="**コマンドリスト**",value=content)
 
         await self.get_destination().send(embed=embed)

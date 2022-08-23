@@ -74,7 +74,7 @@ class SqlSet:
         return res
                 
 
-    def registered_list(self,bot,guild_id):
+    def guild_registrations(self,bot,guild_id):
         res = list()
         with closing(sqlite3.connect(self.dbname)) as connection:
             connection.row_factory = sqlite3.Row
