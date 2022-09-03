@@ -1,6 +1,31 @@
 from discord.ext import commands # Bot Commands Frameworkのインポート
 import main as main
-import discord
+from discord.ui import button , View , Button
+from discord.interactions import Interaction
+
+
+class FileChangeView(View):
+    def __init__(self,keyword,ctx):
+        super().__init__(timeout=None)
+        self.keyword = keyword
+        self.ctx = ctx
+
+    
+    @button(label='置き換える')
+    async def delok(self, interaction: Interaction,button: Button):
+        main.sql.update_dt(guild_id=interaction.guild_id, keyword=self.keyword, content=str(self.ctx.message.attachments[0]), userid=self.ctx.author.id)
+        self.delok.disabled = True
+        self.delno.disabled = True
+        await interaction.response.edit_message(content=f"{interaction.message.content} \n →置き換えました。",view=self)
+
+
+    @button(label='置き換えない')
+    async def delno(self, interaction: Interaction,button: Button):
+        self.delok.disabled = True
+        self.delno.disabled = True
+        await interaction.response.edit_message(content=f"{interaction.message.content} \n →置き換えませんでした。",view=self)
+
+
 class BasicCommands(commands.Cog):
 
     def __init__(self, bot):
@@ -14,14 +39,13 @@ class BasicCommands(commands.Cog):
         新規登録/登録済みファイルの呼び出し
 
         '''
-        _id = ctx.guild.id
         
         if not arg:
             # キーワードが入力されていない場合はその旨を伝える
             await main.Msg.no_arg(ctx)
         else:
             arg = ' '.join(arg)
-            res = main.sql.search_keyword(guild_id = _id,keyword = arg)
+            res = main.sql.search_keyword(guild_id = ctx.guild.id,keyword = arg)
             print(res)
             if ctx.message.attachments:
                 if len(arg) > 20:
@@ -30,24 +54,13 @@ class BasicCommands(commands.Cog):
                 
                 elif res:
                     # キーワードで登録がある場合は上書きするか尋ねる
-                    await ctx.send(f'>>> キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換える場合は {ctx.prefix}okと入力してください。置き換えない場合は{ctx.prefix}noと入力してください。\n >>> {res["content"]}')
-                    # 登録は１枚まで。
-                    for attachment in ctx.message.attachments:
-                        attachment = str(attachment)
-                        self.update_file[str(_id)] = [arg,attachment]
-                        print(self.update_file[str(_id)])
-                        break
+                    await ctx.send(content=f'キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換えますか?\n {res["content"]}',view=FileChangeView(keyword=arg,ctx=ctx))
                 
                 else:
                     # キーワードに登録がない場合は画像登録
                     # 登録は１枚まで。
-                    for attachment in ctx.message.attachments:
-                        attachment = str(attachment)
-                        main.sql.insert_dt(guild_id=_id,keyword=arg,content=attachment,userid=ctx.author.id)
-                        await ctx.send(f'>>> キーワード:{arg}でファイルを登録しました。')
-                        print(f'新規登録:{arg},url:{attachment},by{ctx.author.id}')
-                        break
-
+                        main.sql.insert_dt(guild_id=ctx.guild.id,keyword=arg,content=str(ctx.message.attachments[0]),userid=ctx.author.id)
+                        await ctx.send(f'キーワード:{arg}でファイルを登録しました。')
             
             elif not res:
                 # アタッチメントが無く、登録もない場合はその旨を伝える
@@ -57,32 +70,6 @@ class BasicCommands(commands.Cog):
                 # アタッチメントが無く、登録がある場合は登録画像を表示
                 await ctx.send(f'{res["content"]}')
                 print(f'表示:{arg}')
-        main.postc(ctx,arg)
-
-    @commands.command()
-    async def ok(self,ctx,*arg):
-        '''
-        登録済みファイルの置き換え確認 OK
-        '''
-        _id = ctx.guild.id
-        if str(_id) in self.update_file:
-            keyword = self.update_file[str(_id)][0]
-            attachment = self.update_file[str(_id)][1]
-            main.sql.update_dt(guild_id=_id, keyword=keyword, content=attachment, userid=ctx.author.id)
-            await ctx.send(content=f'>>> キーワード:{keyword}の既存アタッチメントを指定ファイルで置き換えしました。')
-            del self.update_file[str(_id)]
-        main.postc(ctx=ctx)
-
-    @commands.command()
-    async def no(self,ctx,*arg):
-        '''
-        登録済みファイルの置き換え確認　NO
-        '''
-        _id = ctx.guild.id
-        if  str(_id) in self.update_file:
-            keyword = self.update_file[str(_id)][0]
-            await ctx.send(content=f'>>> キーワード:{keyword}に登録された既存ファイルを指定されたファイルで置き換えしません。')
-            del self.update_file[str(_id)]
         main.postc(ctx,arg)
 
 async def setup(bot: commands.Bot):
