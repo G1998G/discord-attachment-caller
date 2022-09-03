@@ -4,7 +4,7 @@ from discord.ui import button , View , Button
 from discord.interactions import Interaction
 
 
-class FileChangeView(View):
+class OverWriteView(View):
     def __init__(self,keyword,ctx):
         super().__init__(timeout=None)
         self.keyword = keyword
@@ -12,17 +12,17 @@ class FileChangeView(View):
 
     
     @button(label='置き換える')
-    async def delok(self, interaction: Interaction,button: Button):
+    async def ok(self, interaction: Interaction,button: Button):
         main.sql.update_dt(guild_id=interaction.guild_id, keyword=self.keyword, content=str(self.ctx.message.attachments[0]), userid=self.ctx.author.id)
-        self.delok.disabled = True
-        self.delno.disabled = True
+        self.ok.disabled = True
+        self.no.disabled = True
         await interaction.response.edit_message(content=f"{interaction.message.content} \n →置き換えました。",view=self)
 
 
     @button(label='置き換えない')
-    async def delno(self, interaction: Interaction,button: Button):
-        self.delok.disabled = True
-        self.delno.disabled = True
+    async def no(self, interaction: Interaction,button: Button):
+        self.ok.disabled = True
+        self.no.disabled = True
         await interaction.response.edit_message(content=f"{interaction.message.content} \n →置き換えませんでした。",view=self)
 
 
@@ -54,7 +54,7 @@ class BasicCommands(commands.Cog):
                 
                 elif res:
                     # キーワードで登録がある場合は上書きするか尋ねる
-                    await ctx.send(content=f'キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換えますか?\n {res["content"]}',view=FileChangeView(keyword=arg,ctx=ctx))
+                    await ctx.send(content=f'キーワード:{arg}は既にこのファイルが登録されています。ファイルを置き換えますか?\n {res["content"]}',view=OverWriteView(keyword=arg,ctx=ctx))
                 
                 else:
                     # キーワードに登録がない場合は画像登録
