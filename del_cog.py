@@ -1,12 +1,33 @@
+from socket import timeout
 from discord.ext import commands # Bot Commands Frameworkのインポート
+from discord.ui import button , View , Button
+from discord.interactions import Interaction
 import main as main
-import discord
-class DeleteCommands(commands.Cog):
 
+class DelView(View):
+    def __init__(self,keyword):
+        super().__init__(timeout=None)
+        self.keyword = keyword
+
+    
+    @button(label='削除する')
+    async def delok(self, interaction: Interaction,button: Button):
+        main.sql.delete_dt(guild_id=interaction.guild_id, keyword=self.keyword)
+        self.delok.disabled = True
+        self.delno.disabled = True
+        await interaction.response.edit_message(content=f"{interaction.message.content} \n →削除しました。",view=self)
+
+
+    @button(label='削除しない')
+    async def delno(self, interaction: Interaction,button: Button):
+        self.delok.disabled = True
+        self.delno.disabled = True
+        await interaction.response.edit_message(content=f"{interaction.message.content} \n →削除しませんでした。",view=self)
+
+class DeleteCommands(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.deletekeyword = dict()
 
     @commands.command(name='del')
     async def _delete(self,ctx,*arg):
@@ -23,41 +44,12 @@ class DeleteCommands(commands.Cog):
 
             res = main.sql.search_keyword(guild_id = _id,keyword = arg)
             if res:
-                await ctx.send(f'>>> キーワード:{arg}に登録されたこのファイルを削除しますか？　削除する場合は {ctx.prefix}delok, しない場合は {ctx.prefix}delnoと入力してください。\n {res["content"]}')
-                self.deletekeyword[str(_id)] = arg
+                await ctx.send(f'キーワード:{arg}に登録されたこのファイルを削除しますか？\n {res["content"]}',view=DelView(arg))
+
             else:
                 await main.Msg.no_img(ctx,arg)
         else:
             await main.Msg.no_arg(ctx)
-        main.postc(ctx,arg)
-
-    @commands.command()
-    async def delok(self,ctx,*arg):
-        '''
-        登録削除を確認 OK
-        '''
-        _id = ctx.guild.id
-        if str(_id) in self.deletekeyword:
-            keyword = self.deletekeyword[str(_id)]
-            main.sql.delete_dt(guild_id=_id, keyword=keyword)
-            await ctx.send(f'>>> キーワード:{keyword}に登録されたファイルを削除しました。')
-            del self.deletekeyword[str(_id)]
-        else:
-            await ctx.send(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}delキーワードで削除する登録を指定してください')
-        main.postc(ctx,arg)
-
-    @commands.command()
-    async def delno(self,ctx,*arg):
-        '''
-        登録削除を確認 NO
-        '''
-        _id = ctx.guild.id
-        if str(_id) in self.deletekeyword:
-            keyword = self.deletekeyword[str(_id)]
-            await ctx.send(f'>>> キーワード:{keyword}に登録されたファイルを削除しません。')
-            del self.deletekeyword[str(_id)]
-        else:
-            await ctx.send(f'>>> このコマンドは登録削除実行用コマンドです。まずは{ctx.prefix}del キーワードで削除する登録を指定してください')
         main.postc(ctx,arg)
 
 async def setup(bot:commands.Bot):
