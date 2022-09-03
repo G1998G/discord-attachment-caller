@@ -1,4 +1,3 @@
-from socket import timeout
 from discord.ext import commands # Bot Commands Frameworkのインポート
 from discord.ui import button , View , Button
 from discord.interactions import Interaction
