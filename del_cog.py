@@ -33,7 +33,6 @@ class DeleteCommands(commands.Cog):
         '''
         登録を削除する
         '''
-        _id = ctx.guild.id
         if arg:
             arg = ' '.join(arg)
             if len(arg) > 20:
@@ -41,7 +40,7 @@ class DeleteCommands(commands.Cog):
                 main.postc()
                 return
 
-            res = main.sql.search_keyword(guild_id = _id,keyword = arg)
+            res = main.sql.search_keyword(guild_id = ctx.guild.id,keyword = arg)
             if res:
                 await ctx.send(f'キーワード:{arg}に登録されたこのファイルを削除しますか？\n {res["content"]}',view=DelView(arg))
 
