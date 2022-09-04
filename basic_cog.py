@@ -31,7 +31,6 @@ class BasicCommands(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.update_file = dict()
 
     @commands.command()
     async def call(self,ctx,*arg):
@@ -49,7 +48,7 @@ class BasicCommands(commands.Cog):
             print(res)
             if ctx.message.attachments:
                 if len(arg) > 20:
-                     # キーワードが10文字以上の場合は拒否
+                     # キーワードが特定の文字数以上の場合は拒否
                     await main.Msg.len_over(ctx)
                 
                 elif res:
